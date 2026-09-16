@@ -21,15 +21,14 @@
           <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
           <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1" />
         </svg>
-        <span>Sintonízanos en Vivo</span>
+        <span>{{ station.fullName }} en vivo</span>
       </h1>
 
       <span class="live-player__rule" aria-hidden="true"></span>
 
       <p class="live-player__subtitle">
-        <strong>Lanceros Stereo 94.1 FM</strong> · Emisora comunitaria de
-        {{ station.address.city }},
-        {{ station.address.region }}
+        Emisora comunitaria de
+        <strong>{{ station.address.city }}, {{ station.address.region }}</strong>
       </p>
     </header>
 

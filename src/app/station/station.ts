@@ -31,8 +31,10 @@ export const STATION = {
     postalCode: '150401',
     country: 'CO',
     countryName: 'Colombia',
-    latitude: 5.7,
-    longitude: -73.233,
+    // Las del pin de la emisora en Google Maps (el mismo de `mapsUrl`), no las
+    // del centro del municipio: son las que cruza Google para la búsqueda local.
+    latitude: 5.6892,
+    longitude: -73.22803,
     mapsUrl: 'https://maps.app.goo.gl/fZg7bTQHtSB2Tu9c6',
   },
 

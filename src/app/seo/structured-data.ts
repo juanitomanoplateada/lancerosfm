@@ -39,6 +39,7 @@ export function radioStationSchema(): Schema {
       latitude: STATION.address.latitude,
       longitude: STATION.address.longitude,
     },
+    hasMap: STATION.address.mapsUrl,
     areaServed: {
       '@type': 'AdministrativeArea',
       name: `${STATION.address.city}, ${STATION.address.region}, ${STATION.address.countryName}`,

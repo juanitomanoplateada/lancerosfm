@@ -110,7 +110,14 @@
   outline-color: var(--color-accent);
 }
 
-@media (max-width: 22.5rem) {
+/* Hasta el ancho de los celulares más comunes (416 px) se compacta para que las
+   cuatro secciones quepan en una sola fila y no empujen el reproductor hacia
+   abajo. */
+@media (max-width: 26rem) {
+  .navbar__nav ul {
+    column-gap: var(--sp-1);
+  }
+
   .navbar__nav a {
     padding-inline: var(--sp-2);
     font-size: var(--text-xs);
