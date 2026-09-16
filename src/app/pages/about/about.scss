@@ -1,0 +1,58 @@
+.transmission-chain {
+  display: grid;
+  gap: var(--sp-3);
+  counter-reset: step;
+}
+
+.transmission-chain li {
+  position: relative;
+  max-width: 66ch;
+  padding-left: var(--sp-8);
+  counter-increment: step;
+}
+
+.transmission-chain li::before {
+  position: absolute;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-secondary-soft);
+  color: var(--color-secondary-text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  content: counter(step);
+}
+
+.team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--sp-4);
+}
+
+.team__member {
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.team__name {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.team__role {
+  margin: 0;
+  color: var(--color-secondary-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.team__bio {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--text-sm);
+}

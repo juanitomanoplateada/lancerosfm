@@ -1,0 +1,178 @@
+<!-- El reproductor es lo primero de la página: quien entra solo quiere darle
+     play, no navegar. Todo lo demás va después. -->
+<section class="live-player" aria-labelledby="live-heading">
+  <div class="container live-player__container">
+    <header class="live-player__header">
+      <h1 id="live-heading" class="live-player__title">
+        <svg
+          class="live-player__title-icon"
+          [class.is-playing]="isPlaying()"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
+          <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
+          <circle cx="12" cy="12" r="2" />
+          <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
+          <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1" />
+        </svg>
+        <span>Sintonízanos en Vivo</span>
+      </h1>
+
+      <span class="live-player__rule" aria-hidden="true"></span>
+
+      <p class="live-player__subtitle">
+        <strong>Lanceros Stereo 94.1 FM</strong> · Emisora comunitaria de
+        {{ station.address.city }},
+        {{ station.address.region }}
+      </p>
+    </header>
+
+    <button
+      type="button"
+      class="tune"
+      [attr.aria-label]="isPlaying() ? 'Pausar la emisora' : 'Escuchar la emisora en vivo'"
+      (click)="toggle()"
+    >
+      <span class="tune__visual" [class.is-playing]="isPlaying()">
+        <picture>
+          <source
+            type="image/avif"
+            srcset="/img/logo-256.avif 256w, /img/logo-512.avif 512w"
+            sizes="(max-width: 37.5rem) 70vw, 320px"
+          />
+          <source
+            type="image/webp"
+            srcset="/img/logo-256.webp 256w, /img/logo-512.webp 512w"
+            sizes="(max-width: 37.5rem) 70vw, 320px"
+          />
+          <img
+            class="tune__image"
+            src="/img/logo-256.png"
+            width="320"
+            height="320"
+            alt="Logo de Lanceros Stereo 94.1 FM"
+            fetchpriority="high"
+          />
+        </picture>
+
+        @if (isPlaying()) {
+          <span class="tune__waves" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </span>
+        }
+
+        <span class="tune__badge" aria-hidden="true">
+          @if (isPlaying()) {
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+          } @else if (isBusy()) {
+            <svg
+              class="tune__spinner"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+            >
+              <circle cx="12" cy="12" r="10" stroke-opacity="0.25" />
+              <path d="M12 2a10 10 0 0 1 10 10" />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M6 3.8v16.4c0 .8.9 1.3 1.6.9l13-8.2c.6-.4.6-1.3 0-1.7l-13-8.2c-.7-.5-1.6 0-1.6.8z"
+              />
+            </svg>
+          }
+        </span>
+      </span>
+
+      <span class="tune__label">
+        @if (isPlaying()) {
+          Pausar
+        } @else if (isBusy()) {
+          Conectando…
+        } @else {
+          Escuchar en vivo
+        }
+      </span>
+    </button>
+
+    <p class="tune__now" aria-live="polite">
+      @if (hasFailed()) {
+        <span class="tune__now-label">Sin conexión con la emisora</span>
+        <span class="tune__now-track">Revisa tu internet y vuelve a intentarlo.</span>
+      } @else if (track().title) {
+        <span class="tune__now-label">{{
+          isPlaying() ? 'Sonando ahora' : 'Ahora en la 94.1'
+        }}</span>
+        <span class="tune__now-track">
+          @if (track().artist) {
+            <b>{{ track().artist }}</b> ·
+          }
+          {{ track().title }}
+        </span>
+      } @else {
+        <span class="tune__now-track">Transmitimos las 24 horas, todos los días.</span>
+      }
+    </p>
+  </div>
+</section>
+
+<section class="section section--diferida" aria-labelledby="on-air-heading">
+  <div class="container">
+    <h2 id="on-air-heading">Lo que suena en la 94.1</h2>
+    <p class="section__lead">
+      Música popular, vallenato, rancheras y baladas, mezclado con los avisos, los saludos y las
+      noticias de
+      {{ station.address.city }}. La emisora acompaña el día de la casa, del trabajo en el campo y
+      del viaje a Tunja.
+    </p>
+
+    <div class="cards">
+      <article class="card">
+        <h3>Pide tu canción</h3>
+        <p>
+          Escríbenos por WhatsApp con la canción y el saludo que quieres mandar. Lo ponemos al aire.
+        </p>
+        <a class="btn btn--whatsapp" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
+          Pedir por WhatsApp
+        </a>
+      </article>
+
+      <article class="card">
+        <h3>Escúchanos donde estés</h3>
+        <p>
+          En {{ station.frequency }} si estás en {{ station.address.region }}, y por internet desde
+          cualquier ciudad o país.
+        </p>
+        <a class="btn btn--ghost" routerLink="/como-escuchar">Cómo escucharnos</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section section--quiet section--diferida" aria-labelledby="about-heading">
+  <div class="container container--narrow">
+    <h2 id="about-heading">La emisora de {{ station.address.city }}</h2>
+    <p>
+      Lanceros Stereo transmite en {{ station.frequency }} desde {{ station.address.city }},
+      {{ station.address.region }}, en la Provincia Centro, a 26 kilómetros de Tunja. Es una emisora
+      comunitaria: la programación se hace con la gente del municipio y para la gente del municipio.
+    </p>
+    <p>
+      Esta página existe sobre todo para quien escucha fuera del alcance de la señal — los que se
+      fueron a trabajar a otra ciudad, la familia en el exterior, o quien sencillamente anda con el
+      celular en la mano.
+    </p>
+    <a class="btn btn--ghost" routerLink="/nosotros">Conocer la emisora</a>
+  </div>
+</section>

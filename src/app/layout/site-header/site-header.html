@@ -1,0 +1,26 @@
+<header class="navbar">
+  <div class="container navbar__inner">
+    <a routerLink="/" class="navbar__logo" aria-label="Lanceros Stereo 94.1 FM, ir al inicio">
+      Lanceros Stereo <span class="navbar__logo-highlight">94.1 FM</span>
+    </a>
+
+    @if (isPlaying()) {
+      <p class="navbar__on-air">
+        <span class="navbar__on-air-dot" aria-hidden="true"></span>
+        Al aire
+      </p>
+    }
+
+    <nav class="navbar__nav" aria-label="Navegación principal">
+      <ul>
+        <li>
+          <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }"
+            >Inicio</a
+          >
+        </li>
+        <li><a routerLink="/nosotros" routerLinkActive="is-active">Nosotros</a></li>
+        <li><a routerLink="/contacto" routerLinkActive="is-active">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>

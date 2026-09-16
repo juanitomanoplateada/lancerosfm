@@ -1,0 +1,9 @@
+<header class="page-header">
+  <div class="container container--narrow">
+    <p class="page-header__eyebrow">{{ eyebrow() }}</p>
+    <h1>{{ title() }}</h1>
+    @if (lead()) {
+      <p class="page-header__lead">{{ lead() }}</p>
+    }
+  </div>
+</header>

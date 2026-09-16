@@ -1,13 +1,45 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Lancerosfm</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <title>Lanceros Stereo 94.1 FM</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- El título, la descripción, el canónico y las etiquetas sociales los fija
+         SeoService por ruta, y el prerender los deja escritos en cada HTML. -->
+
+    <meta name="theme-color" content="#1d2e50" />
+    <meta name="apple-mobile-web-app-title" content="Lanceros 94.1" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon-180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- La tipografía base y el logo son lo primero que se ve: se piden ya. -->
+    <link
+      rel="preload"
+      href="/fonts/inter-var-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/img/logo-256.avif"
+      type="image/avif"
+      imagesrcset="/img/logo-256.avif 256w, /img/logo-512.avif 512w"
+      imagesizes="(max-width: 30rem) 200px, 248px"
+    />
+
+    <!-- El audio arranca al primer clic: adelantamos el saludo TLS. -->
+    <link rel="preconnect" href="https://stream.zeno.fm" crossorigin />
+    <link rel="preconnect" href="https://api.zeno.fm" crossorigin />
+  </head>
+
+  <body>
+    <app-root></app-root>
+  </body>
 </html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Lanceros Stereo 94.1 FM">
+  <rect width="32" height="32" rx="7" fill="#1d2e50"/>
+  <g fill="none" stroke="#2bd39a" stroke-width="2.4" stroke-linecap="round">
+    <path d="M9.2 22.8C4 17.6 4 14.4 9.2 9.2"/>
+    <path d="M22.8 9.2c5.2 5.2 5.2 8.4 0 13.6"/>
+  </g>
+  <g fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round">
+    <path d="M13.1 18.9c-3.1-3.1-3.1-4.7 0-7.8"/>
+    <path d="M18.9 11.1c3.1 3.1 3.1 4.7 0 7.8"/>
+  </g>
+  <circle cx="16" cy="15" r="2.6" fill="#ffffff"/>
+</svg>

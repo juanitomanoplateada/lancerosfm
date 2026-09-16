@@ -1,17 +1,49 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# Compiled output
+# Salida de compilación
 /dist
 /tmp
 /out-tsc
 /bazel-out
+*.tsbuildinfo
 
 # Node
 /node_modules
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
 
-# IDEs and editors
+# Registros
+logs/
+*.log
+
+# Caché de Angular CLI (compilación, Vite y SSR)
+/.angular/
+
+# Pruebas y cobertura
+/coverage
+/.nyc_output
+__screenshots__/
+testem.log
+
+# SonarQube: la configuración lleva el token de análisis y .scannerwork es
+# la salida temporal del escáner.
+sonar-project.properties
+/.scannerwork/
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Vercel (enlace local del proyecto y salida de `vercel build`)
+.vercel/
+
+# IDEs y editores
 .idea/
 .project
 .classpath
@@ -19,26 +51,27 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+*.swp
+*.swo
+*~
 
 # Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/mcp.json
-.history/*
+.vscode/
+.history/
 
-# Miscellaneous
-/.angular/cache
+# Claude Code (ajustes personales)
+.claude/settings.local.json
+
+# Varios
 .sass-cache/
 /connect.lock
-/coverage
 /libpeerconnection.log
-testem.log
 /typings
-__screenshots__/
 
-# System files
+# Archivos del sistema
 .DS_Store
+._*
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

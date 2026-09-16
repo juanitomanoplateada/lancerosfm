@@ -1,0 +1,62 @@
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div class="site-footer__brand">
+      <p class="site-footer__name">{{ station.fullName }}</p>
+      <p class="site-footer__tagline">{{ station.tagline }} · {{ station.motto }}</p>
+      <p class="site-footer__slogan">«{{ station.slogan }}»</p>
+    </div>
+
+    <section class="site-footer__block" aria-labelledby="footer-contact">
+      <h2 id="footer-contact" class="site-footer__title">Contacto</h2>
+      <ul class="site-footer__list">
+        <li>
+          <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
+            WhatsApp {{ station.contact.phoneDisplay }}
+          </a>
+        </li>
+        <li>
+          <a [href]="'mailto:' + station.contact.email">{{ station.contact.email }}</a>
+        </li>
+        <li>
+          <a [href]="station.address.mapsUrl" target="_blank" rel="noopener noreferrer">
+            {{ station.address.street }}, {{ station.address.city }}
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <nav class="site-footer__block" aria-labelledby="footer-sections">
+      <h2 id="footer-sections" class="site-footer__title">Secciones</h2>
+      <ul class="site-footer__list">
+        <li><a routerLink="/">Escuchar en vivo</a></li>
+        <li><a routerLink="/como-escuchar">Cómo escucharnos</a></li>
+        <li><a routerLink="/nosotros">Nosotros</a></li>
+        <li><a routerLink="/contacto">Contacto</a></li>
+      </ul>
+    </nav>
+
+    <section class="site-footer__block" aria-labelledby="footer-social">
+      <h2 id="footer-social" class="site-footer__title">Síguenos</h2>
+      <ul class="site-footer__list">
+        <li>
+          <a [href]="station.social.facebook" target="_blank" rel="noopener noreferrer">Facebook</a>
+        </li>
+        <li>
+          <a [href]="station.social.instagram" target="_blank" rel="noopener noreferrer"
+            >Instagram</a
+          >
+        </li>
+        <li>
+          <a [href]="station.social.tiktok" target="_blank" rel="noopener noreferrer">TikTok</a>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="container site-footer__legal">
+    <p>
+      © {{ year }} {{ station.fullName }} · {{ station.address.city }}, {{ station.address.region }}
+    </p>
+    <p>Emisora comunitaria. Transmitimos las 24 horas, todos los días.</p>
+  </div>
+</footer>

@@ -1,0 +1,99 @@
+<app-page-header
+  eyebrow="Quiénes somos"
+  title="La emisora de Tuta"
+  lead="Dios, vida y alegría. Sintonizados con el progreso."
+/>
+
+<section class="section">
+  <div class="container container--narrow prose">
+    <p>
+      Lanceros Stereo es la emisora comunitaria de {{ station.address.city }},
+      {{ station.address.region }}. Transmite en {{ station.frequency }} y, desde esta página, en
+      vivo por internet para quien esté fuera del alcance de la señal.
+    </p>
+
+    <p>
+      Ser comunitaria no es una etiqueta: significa que la programación se arma con lo que pasa en
+      el municipio. Los avisos de la junta de acción comunal, la misa, el mercado, el saludo de
+      cumpleaños, la canción que alguien pide para mandarle a un hijo que se fue a trabajar lejos.
+      Eso es lo que suena entre canción y canción.
+    </p>
+
+    <h2>Desde dónde transmitimos</h2>
+
+    <p>
+      La emisora queda en la {{ station.address.street }} de {{ station.address.city }}, un
+      municipio de la Provincia Centro de {{ station.address.region }}, a 26 kilómetros de Tunja y a
+      unos 2.600 metros sobre el nivel del mar. Antes de la llegada de los españoles el territorio
+      fue de los muiscas, y de esa lengua viene su nombre: Tuta, «labranzas prestadas». El pueblo,
+      como se conoce hoy, se fundó el 4 de junio de 1776.
+    </p>
+
+    <p>
+      Es tierra de papa, cebada y maíz, de ganadería y minería — y también de ciclistas: de aquí
+      salieron Miguel Samacá y Miguel Ángel Sanabria. La señal de la 94.1 acompaña ese día a día: la
+      casa, el trabajo en el campo y el viaje a Tunja.
+    </p>
+
+    <h2>Cómo llega la señal hasta tu celular</h2>
+
+    <p>
+      Entre la consola de la emisora y el reproductor de esta página hay una cadena que armamos
+      completa, y vale la pena contarla porque explica por qué el nombre de la canción aparece
+      sincronizado con lo que suena:
+    </p>
+
+    <ol class="transmission-chain">
+      <li>
+        <b>La consola</b> entrega el audio ya mezclado: la programación automatizada y la locución
+        en vivo.
+      </li>
+      <li>
+        <b>Un servicio propio</b> lee los registros de emisión y publica cuál es la canción que está
+        al aire en este momento.
+      </li>
+      <li>
+        <b>El codificador</b> toma el audio, lo comprime y le adjunta ese título, de modo que sonido
+        y nombre viajen juntos y no cada uno por su lado.
+      </li>
+      <li><b>La distribución</b> reparte el stream por internet y publica los metadatos.</li>
+      <li>
+        <b>Esta página</b> recibe las dos cosas y te las muestra: el audio en el reproductor y el
+        título de la canción en pantalla.
+      </li>
+    </ol>
+
+    <p>
+      El detalle no obvio está en el paso tres. Si el título se pegara al final del camino en vez de
+      en el momento de codificar, verías el nombre de una canción mientras suena otra.
+    </p>
+
+    <h2>El equipo</h2>
+
+    @if (team.length) {
+      <ul class="team">
+        @for (member of team; track member.name) {
+          <li class="team__member">
+            <p class="team__name">{{ member.name }}</p>
+            <p class="team__role">{{ member.role }}</p>
+            @if (member.bio) {
+              <p class="team__bio">{{ member.bio }}</p>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <p>
+        Detrás del micrófono hay un equipo pequeño que sostiene la emisora todos los días. Estamos
+        preparando esta sección para presentarlos como corresponde, con nombre y programa.
+      </p>
+    }
+
+    <h2>Hablemos</h2>
+    <p>
+      Para pedir una canción, mandar un saludo, pautar un aviso o proponer algo para la
+      programación, estamos a un mensaje de distancia.
+    </p>
+    <a class="btn" routerLink="/contacto">Ver los datos de contacto</a>
+  </div>
+</section>

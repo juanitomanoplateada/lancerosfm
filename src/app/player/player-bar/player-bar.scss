@@ -1,0 +1,344 @@
+:host {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--z-player);
+}
+
+.radio-player {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  height: var(--player-bar-h);
+  padding: 0 var(--sp-5) env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  background-color: var(--color-bar);
+  color: var(--color-white);
+  box-shadow: 0 -8px 30px rgb(0 0 0 / 30%);
+}
+
+/* --- Botón de reproducción ----------------------------------------------- */
+
+.play-btn {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 50%;
+  background-color: var(--color-bar-control);
+  color: var(--color-white);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
+}
+
+.play-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.play-btn:hover {
+  border-color: var(--color-secondary);
+  background-color: var(--color-secondary);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgb(0 139 94 / 40%);
+}
+
+.play-btn:active {
+  transform: scale(0.97);
+}
+
+.play-btn.is-busy {
+  border-color: var(--color-primary-light);
+  background-color: var(--color-primary-light);
+}
+
+.spinner {
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Metadatos ------------------------------------------------------------ */
+
+.metadata__text {
+  display: flex;
+  align-items: center;
+  color: var(--color-white);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.metadata__text .artist {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.metadata__text .divider {
+  margin: 0 8px;
+  color: rgb(255 255 255 / 40%);
+}
+
+.metadata__text .title {
+  font-weight: 500;
+}
+
+/* En pantallas anchas el título va centrado en la barra, con puntos
+   suspensivos si no cabe: hay sitio de sobra y no hace falta moverlo. */
+.metadata-desktop {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  max-width: calc(100% - 340px);
+  overflow: hidden;
+  transform: translateX(-50%);
+}
+
+.metadata-desktop .metadata__text {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metadata-mobile {
+  display: none;
+}
+
+/* --- Aviso de error ------------------------------------------------------- */
+
+.player-error {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.player-error__text {
+  overflow: hidden;
+  color: var(--color-on-dark-muted);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-error__retry {
+  flex-shrink: 0;
+  min-height: 2.25rem;
+  padding-inline: var(--sp-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* --- Volumen -------------------------------------------------------------- */
+
+.volume-control {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.volume-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+  border-radius: 50%;
+  color: var(--color-white);
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+}
+
+.volume-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.volume-btn:hover {
+  background-color: rgb(255 255 255 / 8%);
+  color: var(--color-accent);
+}
+
+.volume-control input[type='range'] {
+  width: 90px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 15%);
+  appearance: none;
+  cursor: pointer;
+  touch-action: none;
+  transition: background var(--transition);
+}
+
+.volume-control input[type='range']:hover {
+  background: rgb(255 255 255 / 25%);
+}
+
+.volume-control input[type='range']::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--color-white);
+  border-radius: 50%;
+  background: var(--color-secondary);
+  appearance: none;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 40%);
+  cursor: pointer;
+  transition:
+    transform 150ms,
+    background-color 150ms;
+}
+
+.volume-control input[type='range']:hover::-webkit-slider-thumb {
+  background-color: var(--color-accent);
+  transform: scale(1.25);
+}
+
+.volume-control input[type='range']::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--color-white);
+  border-radius: 50%;
+  background: var(--color-secondary);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 40%);
+  cursor: pointer;
+}
+
+.radio-player :focus-visible {
+  outline-color: var(--color-accent);
+}
+
+/* --- Pantallas estrechas -------------------------------------------------- */
+
+@media (max-width: 48rem) {
+  .radio-player {
+    gap: var(--sp-3);
+    padding-inline: var(--sp-3);
+  }
+
+  .metadata-desktop {
+    display: none;
+  }
+
+  /* Aquí el título no cabe casi nunca, así que se desplaza en bucle: es la
+     única forma de leerlo completo sin sacrificar el resto de la barra. */
+  .metadata-mobile {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 15px,
+      #000 calc(100% - 15px),
+      transparent
+    );
+  }
+
+  .metadata-mobile__track {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    white-space: nowrap;
+    animation: marquee 20s linear infinite;
+    will-change: transform;
+  }
+
+  /* Sin título real no hay nada que desplazar. */
+  .metadata-mobile__track.is-static {
+    animation: none;
+    max-width: 100%;
+  }
+
+  .metadata-mobile__track.is-static .metadata__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .metadata-mobile__track:hover,
+  .metadata-mobile__track:focus-within {
+    animation-play-state: paused;
+  }
+
+  .metadata-mobile .metadata__text {
+    font-size: 0.85rem;
+  }
+
+  .volume-control {
+    gap: 0;
+    transition: gap var(--transition);
+  }
+
+  .volume-control input[type='range'] {
+    width: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      width var(--transition),
+      opacity var(--transition),
+      margin var(--transition);
+  }
+
+  .volume-control.is-expanded {
+    gap: 6px;
+  }
+
+  .volume-control.is-expanded input[type='range'] {
+    width: 60px;
+    margin-left: 4px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translate3d(calc(-50% - 20px), 0, 0);
+  }
+}
+
+/* Con movimiento reducido la marquesina se detiene y el título se corta con
+   puntos suspensivos, en vez de quedar congelado a mitad de recorrido. */
+@media (prefers-reduced-motion: reduce) {
+  .metadata-mobile__track {
+    max-width: 100%;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .metadata-mobile__track .metadata__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .metadata-mobile__track .metadata__text:nth-child(2) {
+    display: none;
+  }
+}

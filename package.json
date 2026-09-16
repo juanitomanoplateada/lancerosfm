@@ -5,8 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "postbuild": "node -e \"require('node:fs').copyFileSync('dist/lancerosfm/browser/404/index.html','dist/lancerosfm/browser/404.html')\"",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "format": "prettier --write \"src/**/*.{ts,html,scss}\""
   },
   "private": true,
   "packageManager": "npm@11.17.0",
@@ -14,9 +16,11 @@
     "@angular/common": "^22.1.0",
     "@angular/compiler": "^22.1.0",
     "@angular/core": "^22.1.0",
-    "@angular/forms": "^22.1.0",
     "@angular/platform-browser": "^22.1.0",
+    "@angular/platform-server": "^22.1.6",
     "@angular/router": "^22.1.0",
+    "@angular/service-worker": "^22.1.6",
+    "@angular/ssr": "^22.1.8",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

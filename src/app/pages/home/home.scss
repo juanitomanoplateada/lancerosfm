@@ -1,0 +1,311 @@
+/* Bloque «Sintonízanos en Vivo»: es la cara de la emisora y conserva sus gestos
+   gráficos — el subrayado verde bajo el título, el icono que se vuelve dorado
+   al aire, el logo con borde blanco y las ondas que salen de él. */
+
+.live-player {
+  width: 100%;
+  padding-block: var(--sp-6) var(--sp-7);
+  text-align: center;
+}
+
+.live-player__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.live-player__header {
+  margin-bottom: var(--sp-5);
+}
+
+.live-player__title {
+  font-size: clamp(1.55rem, 4vw, 2.6rem);
+  font-weight: 800;
+}
+
+.live-player__title-icon,
+.live-player__title span {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.live-player__rule {
+  display: block;
+  width: 80px;
+  height: 4px;
+  margin: var(--sp-3) auto 0;
+  border-radius: 2px;
+  background: var(--color-secondary);
+}
+
+.live-player__title-icon {
+  margin-right: 0.6rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: var(--color-secondary);
+  transition: color var(--transition);
+}
+
+.live-player__title-icon.is-playing {
+  color: var(--color-accent);
+  animation: pulse-icon 1.5s ease-in-out infinite;
+}
+
+.live-player__subtitle {
+  max-width: 34rem;
+  margin-inline: auto;
+  margin-top: var(--sp-3);
+  color: var(--color-gray-dark);
+  font-size: clamp(0.98rem, 2vw, 1.2rem);
+  font-weight: 500;
+}
+
+.live-player__subtitle strong {
+  color: var(--color-primary);
+}
+
+/* --- El logo es el botón -------------------------------------------------- */
+
+.tune {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: 0;
+  border-radius: var(--radius-md);
+}
+
+.tune__visual {
+  position: relative;
+  display: block;
+  width: min(62vw, 320px, 32vh);
+  height: min(62vw, 320px, 32vh);
+  aspect-ratio: 1;
+}
+
+.tune__image {
+  width: 100%;
+  height: 100%;
+  border: 6px solid var(--color-white);
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: var(--shadow-lg);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition);
+}
+
+.tune:hover .tune__image {
+  transform: scale(1.02);
+}
+
+.tune__visual.is-playing .tune__image {
+  transform-origin: center;
+  box-shadow: 0 12px 40px rgb(0 139 94 / 20%);
+  animation: heartbeat 2.5s ease-in-out infinite;
+}
+
+/* --- Ondas ---------------------------------------------------------------- */
+
+.tune__waves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.tune__waves span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--color-secondary);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.7);
+  box-shadow:
+    0 0 15px rgb(0 139 94 / 20%),
+    inset 0 0 15px rgb(0 139 94 / 5%);
+  animation: wave 3.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+.tune__waves span:nth-child(2) {
+  animation-delay: 0.875s;
+}
+.tune__waves span:nth-child(3) {
+  animation-delay: 1.75s;
+}
+.tune__waves span:nth-child(4) {
+  animation-delay: 2.625s;
+}
+
+/* --- Distintivo de reproducción ------------------------------------------- */
+
+.tune__badge {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border: 4px solid var(--color-bg-light);
+  border-radius: 50%;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  transform: translate(-50%, 30%);
+  box-shadow: var(--shadow-md);
+  transition: background var(--transition);
+}
+
+.tune__badge svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.tune:hover .tune__badge {
+  background: var(--color-primary);
+}
+
+.tune__spinner {
+  animation: spin 1.2s linear infinite;
+}
+
+/* --- Etiqueta ------------------------------------------------------------- */
+
+.tune__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  margin-top: var(--sp-3);
+  padding-inline: var(--sp-7);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+  transition: background var(--transition);
+}
+
+.tune:hover .tune__label {
+  background: var(--color-accent-light);
+}
+
+.tune:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 6px;
+}
+
+/* --- Qué está sonando ----------------------------------------------------- */
+
+.tune__now {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  max-width: 34rem;
+  min-height: 3.5rem;
+  margin-top: var(--sp-5);
+  padding-inline: var(--sp-2);
+}
+
+.tune__now-label {
+  color: var(--color-secondary-text);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tune__now-track {
+  color: var(--color-gray-dark);
+  font-size: var(--text-lg);
+  overflow-wrap: break-word;
+}
+
+.tune__now-track b {
+  color: var(--color-primary);
+}
+
+/* --- Animaciones ---------------------------------------------------------- */
+
+@keyframes heartbeat {
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes wave {
+  0% {
+    opacity: 0.65;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+@keyframes pulse-icon {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Adaptaciones --------------------------------------------------------- */
+
+@media (max-width: 37.5rem) {
+  .live-player {
+    padding-block: var(--sp-5) var(--sp-6);
+  }
+
+  .live-player__header {
+    margin-bottom: var(--sp-4);
+  }
+
+  .live-player__title-icon {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .live-player__rule {
+    width: 60px;
+    height: 3px;
+  }
+
+  .tune__badge {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  .tune__label {
+    min-height: 3rem;
+    padding-inline: var(--sp-5);
+    font-size: var(--text-base);
+  }
+}
+
+/* En pantallas anchas pero bajas —un portátil— se recorta el aire vertical. */
+@media (min-width: 37.5rem) and (max-height: 51rem) {
+  .live-player {
+    padding-block: var(--sp-4) var(--sp-5);
+  }
+
+  .live-player__header {
+    margin-bottom: var(--sp-4);
+  }
+}

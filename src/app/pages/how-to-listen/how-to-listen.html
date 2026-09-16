@@ -1,0 +1,68 @@
+<app-page-header
+  eyebrow="Cómo escucharnos"
+  title="Cuatro maneras de sintonizarnos"
+  lead="En el radio de siempre o en el celular. Escoge la que más te sirva."
+/>
+
+<section class="section">
+  <div class="container container--narrow">
+    <ul class="ways">
+      <li class="way">
+        <h2>En el radio, en 94.1 FM</h2>
+        <p>
+          Si estás en {{ station.address.city }} o en un municipio vecino, mueve el dial hasta el
+          94.1. No necesitas internet ni datos.
+        </p>
+      </li>
+
+      <li class="way">
+        <h2>En el celular</h2>
+        <p>
+          Entra a <b>lancerosfm.com</b> y toca el botón verde. Puedes seguir usando el celular para
+          otra cosa: la emisora sigue sonando y los controles quedan en la pantalla de bloqueo, como
+          cualquier reproductor de música.
+        </p>
+        <a class="btn" routerLink="/">Ir al reproductor</a>
+      </li>
+
+      <li class="way">
+        <h2>Como aplicación instalada</h2>
+        <p>
+          Abre la página en el celular y elige «Agregar a la pantalla de inicio» en el menú del
+          navegador. Queda un icono en el teléfono que abre directo en el reproductor, sin buscar la
+          dirección cada vez.
+        </p>
+      </li>
+
+      <li class="way">
+        <h2>En el computador o en el carro</h2>
+        <p>
+          En el computador funciona igual, en cualquier navegador. En el carro, conecta el celular
+          por bluetooth o por cable y la emisora suena por los parlantes.
+        </p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="section section--quiet" aria-labelledby="faq-heading">
+  <div class="container container--narrow">
+    <h2 id="faq-heading">Preguntas frecuentes</h2>
+
+    <div class="faq">
+      @for (faq of faqs; track faq.question) {
+        <details class="faq__item">
+          <summary class="faq__question">{{ faq.question }}</summary>
+          <p class="faq__answer">{{ faq.answer }}</p>
+        </details>
+      }
+    </div>
+
+    <div class="faq__footer">
+      <p>¿Tu pregunta no está aquí? Escríbenos y te respondemos.</p>
+      <a class="btn btn--whatsapp" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
+        Escribir por WhatsApp
+      </a>
+    </div>
+  </div>
+</section>

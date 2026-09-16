@@ -1,0 +1,140 @@
+<div class="radio-player" role="region" aria-label="Reproductor de Lanceros Stereo 94.1 FM">
+  <button
+    type="button"
+    class="play-btn"
+    [class.is-busy]="isBusy()"
+    [attr.aria-label]="isPlaying() ? 'Pausar la emisora' : 'Sintonizar la emisora en vivo'"
+    (click)="toggle()"
+  >
+    @if (isPlaying()) {
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <rect x="6" y="4" width="4" height="16" rx="1" />
+        <rect x="14" y="4" width="4" height="16" rx="1" />
+      </svg>
+    } @else if (isBusy()) {
+      <svg
+        class="spinner"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.25" />
+        <path d="M12 2a10 10 0 0 1 10 10" />
+      </svg>
+    } @else {
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path
+          d="M6 3.8v16.4c0 .8.9 1.3 1.6.9l13-8.2c.6-.4.6-1.3 0-1.7l-13-8.2c-.7-.5-1.6 0-1.6.8z"
+        />
+      </svg>
+    }
+  </button>
+
+  <!-- Un único anuncio para lectores de pantalla: las dos copias visibles de la
+       marquesina van ocultas para no leer el título dos veces. -->
+  <p class="visually-hidden" aria-live="polite">{{ announcement() }}</p>
+
+  @if (hasFailed()) {
+    <div class="player-error">
+      <span class="player-error__text">No se pudo conectar con la emisora</span>
+      <button type="button" class="player-error__retry" (click)="retry()">Reintentar</button>
+    </div>
+  } @else {
+    <div class="metadata-desktop" aria-hidden="true">
+      <span class="metadata__text">
+        @if (track().artist) {
+          <span class="artist">{{ track().artist }}</span>
+          <span class="divider">·</span>
+        }
+        <span class="title">{{ displayTitle() }}</span>
+      </span>
+    </div>
+
+    <div class="metadata-mobile" aria-hidden="true">
+      <div class="metadata-mobile__track" [class.is-static]="!shouldScroll()">
+        <span class="metadata__text">
+          @if (track().artist) {
+            <span class="artist">{{ track().artist }}</span>
+            <span class="divider">·</span>
+          }
+          <span class="title">{{ displayTitle() }}</span>
+        </span>
+        @if (shouldScroll()) {
+          <span class="metadata__text">
+            @if (track().artist) {
+              <span class="artist">{{ track().artist }}</span>
+              <span class="divider">·</span>
+            }
+            <span class="title">{{ displayTitle() }}</span>
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="volume-control" [class.is-expanded]="volumeExpanded()">
+    <button
+      type="button"
+      class="volume-btn"
+      [attr.aria-label]="volumeButtonLabel()"
+      (click)="onVolumeButton()"
+    >
+      @if (isMuted()) {
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M11 5 6 9H2v6h4l5 4z" />
+          <path d="m23 9-6 6M17 9l6 6" />
+        </svg>
+      } @else if (volume() < 0.5) {
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M11 5 6 9H2v6h4l5 4z" />
+          <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+        </svg>
+      } @else {
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M11 5 6 9H2v6h4l5 4z" />
+          <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+          <path d="M19 5a10 10 0 0 1 0 14" />
+        </svg>
+      }
+    </button>
+
+    <label class="visually-hidden" for="volume">Volumen</label>
+    <input
+      id="volume"
+      type="range"
+      min="0"
+      max="1"
+      step="0.05"
+      [value]="volume()"
+      [attr.aria-valuetext]="volumePercent() + ' por ciento'"
+      (input)="changeVolume($event)"
+    />
+  </div>
+</div>

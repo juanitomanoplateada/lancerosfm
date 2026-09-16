@@ -1,0 +1,100 @@
+/* Tokens de diseño — única fuente de verdad para color, tipografía y espaciado.
+   Ningún componente escribe un color literal: todos leen de aquí.
+
+   La paleta es la institucional de la emisora y no se toca: azul #1d2e50,
+   verde #008b5e, dorado #ffc107, el verde claro #92c880 del logotipo y el
+   greenyellow del botón de contacto. Son los colores con los que la audiencia
+   reconoce a Lanceros Stereo.
+
+   Lo único que se añadió es una variante más oscura del verde para cuando hace
+   de texto sobre blanco: el #008b5e institucional se queda en 4,06:1 y no
+   alcanza el mínimo legible. Como gráfico —subrayados, ondas, iconos— se usa
+   el verde institucional tal cual. */
+
+:root {
+  /* --- Marca --- */
+  --color-primary: #1d2e50;
+  --color-primary-light: #2f4277;
+  --color-secondary: #008b5e;
+  --color-secondary-text: #00704b;
+  --color-accent: #ffc107;
+  --color-accent-light: #ffdb4d;
+  --color-highlight: #92c880;
+  --color-secondary-soft: #e3f3ec;
+  --color-bar: #111b2d;
+  --color-bar-control: #1a263d;
+
+  /* --- Superficies --- */
+  --color-white: #ffffff;
+  --color-bg-light: #f4f6fa;
+  --color-bg-sunken: #e9edf5;
+
+  /* --- Texto --- */
+  --color-gray-dark: #333333;
+  --color-gray: #5c6884;
+  --color-on-dark: #ffffff;
+  --color-on-dark-muted: #c3ccdf;
+
+  /* --- Estado --- */
+  --color-error: #b3261e;
+  --color-error-surface: #fdeceb;
+  --color-warning-text: #8a6100;
+  --color-warning-surface: #fff6dd;
+  --color-live: #ff5a5a;
+
+  /* --- Bordes y sombras --- */
+  --border: #d5dbe8;
+  --shadow-sm: 0 1px 2px rgb(29 46 80 / 8%);
+  --shadow-md: 0 4px 14px rgb(29 46 80 / 10%);
+  --shadow-lg: 0 12px 35px rgb(29 46 80 / 14%);
+
+  /* --- Tipografía --- */
+  --font-base: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Poppins', 'Inter', system-ui, sans-serif;
+
+  /* Escala generosa: buena parte de la audiencia es gente mayor. */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.375rem;
+  --text-2xl: clamp(1.5rem, 1.2rem + 1.4vw, 1.875rem);
+  --text-3xl: clamp(1.7rem, 1.3rem + 2vw, 2.25rem);
+  --text-4xl: clamp(1.9rem, 1.3rem + 3vw, 2.6rem);
+
+  /* --- Espaciado --- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 2.5rem;
+  --sp-8: 3rem;
+  --sp-9: 4rem;
+
+  /* --- Formas --- */
+  --btn-radius: 6px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+
+  /* --- Medidas --- */
+  --container: 68rem;
+  --container-narrow: 46rem;
+
+  /* Alto de la barra del reproductor. El layout reserva este espacio para que
+     la barra nunca tape el final del contenido. */
+  --player-bar-h: 72px;
+
+  /* --- Interacción --- */
+  --tap-target: 2.75rem;
+  --focus-ring: 3px solid var(--color-secondary);
+  --transition: 200ms ease;
+
+  /* --- Capas --- */
+  --z-player: 1000;
+  --z-float: 2000;
+  --z-toast: 3000;
+
+  color-scheme: light;
+}

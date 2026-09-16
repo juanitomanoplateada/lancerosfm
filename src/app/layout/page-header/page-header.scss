@@ -1,0 +1,20 @@
+.page-header {
+  padding-block: var(--sp-7) var(--sp-5);
+  border-bottom: 1px solid var(--border);
+  background: var(--color-white);
+}
+
+.page-header__eyebrow {
+  margin-bottom: var(--sp-2);
+  color: var(--color-secondary-text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.page-header__lead {
+  margin-top: var(--sp-3);
+  color: var(--color-gray-dark);
+  font-size: var(--text-lg);
+}

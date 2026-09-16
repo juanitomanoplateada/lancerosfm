@@ -1,0 +1,97 @@
+/* Por encima de la barra del reproductor y pegado a la derecha, que es donde
+   estaba antes y donde solo pisa el margen de las tarjetas, no su contenido. */
+.contact {
+  position: fixed;
+  right: var(--sp-4);
+  bottom: calc(var(--player-bar-h) + var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  z-index: var(--z-float);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sp-3);
+}
+
+.contact__toggle {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: greenyellow;
+  color: #10230a;
+  box-shadow: 0 6px 15px rgb(0 0 0 / 25%);
+  transition:
+    transform var(--transition),
+    background var(--transition);
+}
+
+.contact__toggle:hover {
+  background: #a8e830;
+  transform: scale(1.08);
+}
+
+.contact__toggle.is-open {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.contact__list {
+  display: grid;
+  gap: var(--sp-2);
+  justify-items: end;
+  opacity: 0;
+  transform: translateY(0.5rem) scale(0.98);
+  transform-origin: bottom right;
+  transition:
+    opacity var(--transition),
+    transform var(--transition);
+  pointer-events: none;
+}
+
+.contact__list.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.contact__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: var(--tap-target);
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+}
+
+.contact__item:hover {
+  border-color: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.contact__item--whatsapp {
+  border-color: transparent;
+  background: #25d366;
+  color: #04310f;
+}
+
+.contact__item--whatsapp:hover {
+  background: #1fbe5b;
+  color: #04310f;
+}
+
+@media (max-width: 40rem) {
+  .contact__item span {
+    /* El texto largo empujaría la burbuja fuera de la pantalla. */
+    max-width: 11rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

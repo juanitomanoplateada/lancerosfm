@@ -1,1 +1,170 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'tokens';
+@use 'fonts';
+@use 'ui';
+
+/* ==========================================================================
+   Estilos globales — Lanceros Stereo 94.1 FM
+   Solo lo que de verdad es global: reset, documento, tipografía base y
+   utilidades compartidas. Todo lo demás vive en el componente que lo usa.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+
+  /* Nada puede desbordar a lo ancho: una sola palabra larga bastaba para
+     provocar barra horizontal en pantallas de 320 px. */
+  overflow-x: hidden;
+  background-color: var(--color-bg-light);
+  color: var(--color-gray-dark);
+  font-family: var(--font-base);
+  font-size: var(--text-base);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+
+  /* La barra del reproductor es fija: el contenido necesita ese colchón para
+     que nada quede escondido detrás al final de la página. */
+  padding-bottom: calc(var(--player-bar-h) + env(safe-area-inset-bottom, 0px));
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+
+  /* Nombres de canciones y palabras largas no deben empujar el layout. */
+  overflow-wrap: break-word;
+}
+
+h1 {
+  font-size: var(--text-4xl);
+}
+h2 {
+  font-size: var(--text-3xl);
+}
+h3 {
+  font-size: var(--text-xl);
+}
+
+p {
+  max-width: 68ch;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--color-secondary-text);
+  text-underline-offset: 3px;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--color-primary);
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Foco visible y consistente en todo el sitio. Nunca se elimina: es la única
+   pista de navegación para quien usa teclado. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--btn-radius);
+}
+
+/* --- Utilidades ---------------------------------------------------------- */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--sp-4);
+}
+
+.container--narrow {
+  max-width: var(--container-narrow);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Salto al contenido: primer elemento enfocable de la página. */
+.skip-link {
+  position: absolute;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  z-index: calc(var(--z-toast) + 1);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--btn-radius);
+  background: var(--color-white);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-200%);
+  transition: transform var(--transition);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* --- Preferencias del sistema -------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
