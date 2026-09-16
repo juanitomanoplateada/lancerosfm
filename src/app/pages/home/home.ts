@@ -4,11 +4,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { RadioPlayer } from '../../player/radio-player';
 import { PageMetadata } from '../../seo/page-metadata';
+import { ShareStation } from '../../share/share-station/share-station';
 import { STATION, WHATSAPP_URL } from '../../station/station';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, ShareStation],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

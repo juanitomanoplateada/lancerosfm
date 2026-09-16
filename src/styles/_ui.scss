@@ -32,7 +32,7 @@
 }
 
 /* Subrayado corto bajo los títulos de sección: es el gesto gráfico de la
-   emisora, el mismo que lleva «Sintonízanos en Vivo». */
+   emisora, el mismo que lleva el título del reproductor en la portada. */
 .section h2::after {
   content: '';
   display: block;

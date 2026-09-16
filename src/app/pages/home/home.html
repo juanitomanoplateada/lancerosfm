@@ -43,12 +43,12 @@
           <source
             type="image/avif"
             srcset="/img/logo-256.avif 256w, /img/logo-512.avif 512w"
-            sizes="(max-width: 37.5rem) 70vw, 320px"
+            sizes="(max-width: 32.25rem) 62vw, 320px"
           />
           <source
             type="image/webp"
             srcset="/img/logo-256.webp 256w, /img/logo-512.webp 512w"
-            sizes="(max-width: 37.5rem) 70vw, 320px"
+            sizes="(max-width: 32.25rem) 62vw, 320px"
           />
           <img
             class="tune__image"
@@ -173,5 +173,18 @@
       celular en la mano.
     </p>
     <a class="btn btn--ghost" routerLink="/nosotros">Conocer la emisora</a>
+  </div>
+</section>
+
+<!-- Va justo después de contar que la página es para quien está lejos: es el
+     momento en que al oyente se le ocurre a quién mandársela. -->
+<section class="section section--diferida" aria-labelledby="share-heading">
+  <div class="container container--narrow">
+    <h2 id="share-heading">Compártela con quien está lejos</h2>
+    <p class="section__lead">
+      Por internet la emisora se escucha desde cualquier ciudad o país. Si tienes familia o amigos
+      fuera de {{ station.address.city }}, mándales el enlace.
+    </p>
+    <app-share-station class="share-actions" />
   </div>
 </section>

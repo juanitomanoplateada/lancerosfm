@@ -1,4 +1,4 @@
-/* Bloque «Sintonízanos en Vivo»: es la cara de la emisora y conserva sus gestos
+/* Bloque del reproductor en vivo: es la cara de la emisora y conserva sus gestos
    gráficos — el subrayado verde bajo el título, el icono que se vuelve dorado
    al aire, el logo con borde blanco y las ondas que salen de él. */
 
@@ -75,6 +75,8 @@
   border-radius: var(--radius-md);
 }
 
+/* Si cambia este tamaño, hay que ajustar también el `sizes` del logo en la
+   plantilla, o el navegador descarga una versión que no corresponde. */
 .tune__visual {
   position: relative;
   display: block;
@@ -308,4 +310,10 @@
   .live-player__header {
     margin-bottom: var(--sp-4);
   }
+}
+
+/* --- Compartir ------------------------------------------------------------ */
+
+.share-actions {
+  margin-top: var(--sp-5);
 }

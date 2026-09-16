@@ -123,6 +123,9 @@ src/
     │   ├── page-metadata.ts    Título, descripción, canónico y etiquetas sociales
     │   └── structured-data.ts  Esquemas JSON-LD
     │
+    ├── share/                  Compartir la emisora
+    │   └── share-station/      WhatsApp, Facebook y copiar enlace
+    │
     ├── pwa/
     │   └── app-updates.ts      Política de actualización del service worker
     │

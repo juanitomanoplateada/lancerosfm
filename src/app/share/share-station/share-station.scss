@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+/* En el celular quedan uno debajo del otro y del mismo ancho, en vez de una
+   escalera de botones de largos distintos. */
+@media (max-width: 30rem) {
+  .share {
+    flex-direction: column;
+  }
+}
