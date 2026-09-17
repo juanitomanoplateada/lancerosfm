@@ -40,15 +40,15 @@ describe('PageMetadata', () => {
 
     const canonicals = document.head.querySelectorAll('link[rel="canonical"]');
     expect(canonicals).toHaveLength(1);
-    expect(canonicals[0].getAttribute('href')).toBe('https://lancerosfm.com/nosotros');
+    expect(canonicals[0].getAttribute('href')).toBe('https://www.lancerosfm.com/nosotros');
   });
 
   it('completa las etiquetas sociales con rutas absolutas', () => {
     pageMetadata.setPage({ path: '/nosotros', title: 'Nosotros', description: 'Sobre la emisora' });
 
-    expect(metaContent('meta[property="og:url"]')).toBe('https://lancerosfm.com/nosotros');
+    expect(metaContent('meta[property="og:url"]')).toBe('https://www.lancerosfm.com/nosotros');
     expect(metaContent('meta[property="og:image"]')).toBe(
-      'https://lancerosfm.com/img/og-banner.jpg',
+      'https://www.lancerosfm.com/img/og-banner.jpg',
     );
     expect(metaContent('meta[property="og:locale"]')).toBe('es_CO');
     expect(metaContent('meta[name="twitter:card"]')).toBe('summary_large_image');

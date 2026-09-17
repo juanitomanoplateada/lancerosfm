@@ -17,7 +17,10 @@ export const STATION = {
   motto: 'Sintonizados con el progreso',
   slogan: 'De ruana por Boyacá',
 
-  origin: 'https://lancerosfm.com',
+  // Tiene que ser el dominio principal de Vercel, el único que no redirige. Si
+  // cambia, hay que cambiarlo también en `public/sitemap.xml` y
+  // `public/robots.txt`, que no leen este valor.
+  origin: 'https://www.lancerosfm.com',
 
   stream: {
     audio: 'https://stream.zeno.fm/jz1bfxan45kuv',

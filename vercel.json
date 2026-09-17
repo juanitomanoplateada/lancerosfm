@@ -5,6 +5,20 @@
   "outputDirectory": "dist/lancerosfm/browser",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/ngsw.json",
+      "has": [{ "type": "host", "value": { "suf": "lancerosfm.online" } }],
+      "destination": "/ngsw-retirado.json",
+      "permanent": false
+    },
+    {
+      "source": "/:path((?!ngsw-retirado\\.json$).*)",
+      "has": [{ "type": "host", "value": { "suf": "lancerosfm.online" } }],
+      "destination": "https://www.lancerosfm.com/:path",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -14,7 +14,7 @@ Reproductor en vivo, canción al aire en tiempo real y contenido de la emisora, 
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
-**[lancerosfm.com](https://lancerosfm.com/)**
+**[lancerosfm.com](https://www.lancerosfm.com/)**
 
 </div>
 
@@ -44,7 +44,7 @@ Dos decisiones ordenan todo lo demás:
 | `/como-escuchar` | Formas de sintonizar y preguntas frecuentes                    |
 | `/contacto`      | WhatsApp, teléfono, correo, dirección y redes                  |
 
-El menú muestra **Inicio, Nosotros y Contacto**; «Cómo escucharnos» se enlaza desde la portada y el pie.
+El menú muestra las cuatro secciones: **Inicio, Cómo escuchar, Nosotros y Contacto**.
 
 ---
 
@@ -227,6 +227,24 @@ Sitio **completamente estático** en Vercel, sin funciones serverless ni variabl
 | Cabeceras              | Seguridad y caché en [`vercel.json`](vercel.json) |
 
 Los archivos con hash se sirven con caché inmutable de un año; el HTML se revalida en cada visita.
+
+### Dominios
+
+| Dominio                 | En Vercel                           | Qué hace                             |
+| ----------------------- | ----------------------------------- | ------------------------------------ |
+| `www.lancerosfm.com`    | Production                          | Dominio principal                    |
+| `lancerosfm.com`        | Redirect 308                        | Lleva a `www.lancerosfm.com`         |
+| `lancerosfm.online`     | Production (redirige `vercel.json`) | Dominio anterior; lleva al principal |
+| `www.lancerosfm.online` | Production (redirige `vercel.json`) | Dominio anterior; lleva al principal |
+
+El principal tiene que coincidir con `origin` en `station.ts`, con `public/sitemap.xml` y con `public/robots.txt`: de ahí salen el canónico y las URL que lee Google.
+
+**Por qué el dominio anterior no redirige desde el panel de Vercel.** Quien usó el sitio en `lancerosfm.online` tiene el service worker instalado, y este abre la portada desde caché sin tocar la red: nunca ve una redirección. La única salida es su propia regla de seguridad, que se desinstala y borra la caché cuando `ngsw.json` responde 404. Una redirección del panel no deja llegar ese 404 —manda la petición a otro dominio y el navegador la trata como falta de conexión—, así que las reglas viven en `vercel.json`:
+
+1. `ngsw.json` en el dominio anterior lleva a un archivo que no existe, y el service worker se retira.
+2. Todo lo demás redirige con 308 a la misma ruta en `www.lancerosfm.com`.
+
+Cada oyente queda migrado en su segunda visita. Las reglas deben quedarse mientras se conserve `lancerosfm.online`.
 
 ---
 

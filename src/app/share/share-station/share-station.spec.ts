@@ -37,13 +37,13 @@ describe('ShareStation', () => {
     const text = link(render(), 'a[href^="https://wa.me/"]').searchParams.get('text');
 
     expect(text).toContain('Lanceros Stereo 94.1 FM');
-    expect(text).toMatch(/https:\/\/lancerosfm\.com\/$/);
+    expect(text).toMatch(/https:\/\/www\.lancerosfm\.com\/$/);
   });
 
   it('comparte en Facebook la dirección de la portada', () => {
     const url = link(render(), 'a[href^="https://www.facebook.com/sharer/"]');
 
-    expect(url.searchParams.get('u')).toBe('https://lancerosfm.com/');
+    expect(url.searchParams.get('u')).toBe('https://www.lancerosfm.com/');
   });
 
   it('copia el enlace y lo confirma', async () => {
@@ -52,7 +52,7 @@ describe('ShareStation', () => {
     render().querySelector('button')!.click();
 
     await vi.waitFor(() => expect(toasts.toasts()).toHaveLength(1));
-    expect(clipboard.writeText).toHaveBeenCalledWith('https://lancerosfm.com/');
+    expect(clipboard.writeText).toHaveBeenCalledWith('https://www.lancerosfm.com/');
     expect(toasts.toasts()[0].type).toBe('success');
   });
 
@@ -64,7 +64,7 @@ describe('ShareStation', () => {
     await vi.waitFor(() => expect(toasts.toasts()).toHaveLength(1));
     const [toast] = toasts.toasts();
     expect(toast.type).toBe('error');
-    expect(toast.message).toContain('https://lancerosfm.com/');
+    expect(toast.message).toContain('https://www.lancerosfm.com/');
   });
 
   it('muestra el enlace si el navegador no tiene portapapeles', async () => {
