@@ -12,6 +12,7 @@ Reproductor en vivo, canción al aire en tiempo real y contenido de la emisora, 
 
 [![Angular](https://img.shields.io/badge/Angular-22-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
 **[lancerosfm.com](https://www.lancerosfm.com/)**
@@ -154,6 +155,7 @@ src/
 - **`protected`** en lo que solo usa la plantilla, y la propiedad **`host`** en lugar de `@HostListener`.
 - **Señales** para el estado, **`inject()`** para las dependencias y **detección de cambios sin zone.js**, que es el comportamiento por defecto de Angular 22.
 - **Modo estricto** de TypeScript y de plantillas.
+- **Cada archivo con su prueba al lado**: `radio-player.ts` y `radio-player.spec.ts` viven en la misma carpeta.
 
 `RadioPlayer` es el único punto que toca el elemento de audio y `PageMetadata` el único que escribe en `<head>`.
 
@@ -198,14 +200,61 @@ npm start
 
 La aplicación queda en `http://localhost:4200/`.
 
-| Comando          | Acción                                                         |
-| ---------------- | -------------------------------------------------------------- |
-| `npm start`      | Servidor de desarrollo                                         |
-| `npm run build`  | Compilado de producción con prerender de todas las rutas y 404 |
-| `npm test`       | Pruebas unitarias con Vitest                                   |
-| `npm run format` | Formato con Prettier                                           |
+| Comando                 | Acción                                                         |
+| ----------------------- | -------------------------------------------------------------- |
+| `npm start`             | Servidor de desarrollo                                         |
+| `npm run build`         | Compilado de producción con prerender de todas las rutas y 404 |
+| `npm test`              | Pruebas unitarias con Vitest, en modo observación              |
+| `npm run test:coverage` | Pruebas una sola vez, con informe de cobertura                 |
+| `npm run lint`          | ESLint sobre el código y las plantillas                        |
+| `npm run format`        | Formato con Prettier                                           |
 
-Requiere Node.js 22 o superior.
+Requiere Node.js 22.22, 24.15 o 26 en adelante, las versiones que admite Angular 22.
+
+---
+
+## Calidad
+
+Antes de publicar, los tres comandos tienen que pasar limpios:
+
+```bash
+npm run lint
+npm run test:coverage
+npm run build
+```
+
+### Pruebas
+
+Corren con Vitest sobre jsdom, a través del constructor de pruebas de Angular. La cobertura exigida es **100 %** en sentencias, ramas, funciones y líneas: los umbrales están en `angular.json` y, si una línea nueva queda sin probar, `npm run test:coverage` falla. El informe queda en `coverage/lancerosfm/`: `lcov.info` para SonarQube y `lcov-report/index.html` para leerlo en el navegador.
+
+Lo que conviene saber antes de escribir una prueba:
+
+- **jsdom no reproduce audio ni trae `EventSource`, `matchMedia` o MediaSession.** Las pruebas los sustituyen por dobles que disparan a mano los eventos del navegador; los de `radio-player.spec.ts` y `player-bar.spec.ts` sirven de modelo.
+- **Las pruebas comparten proceso.** Angular las ejecuta sin aislamiento, así que lo que se cambie en `globalThis` se deshace en el `afterEach` (`vi.unstubAllGlobals()`).
+- **Importar la configuración de servidor activa `ngServerMode` en todo el proceso.** Lo hace `provideServerRendering` al evaluarse. Por eso `main.server.spec.ts` la importa dentro de la prueba y restablece el valor.
+
+### Estilo
+
+ESLint con las reglas recomendadas de TypeScript y de Angular, más las de accesibilidad para las plantillas. Prettier fija el formato: 100 columnas y comillas simples.
+
+### Análisis estático
+
+El proyecto se analiza con SonarQube. La configuración va en `sonar-project.properties`, que **no se versiona** porque lleva el token de análisis; lo esencial que debe contener:
+
+```properties
+sonar.projectKey=lancerosfm
+sonar.host.url=http://localhost:9000
+sonar.token=<token de análisis>
+# Sin esto, el escáner en Windows corrompe las tildes de comentarios y textos.
+sonar.sourceEncoding=UTF-8
+sonar.sources=src
+sonar.tests=src
+sonar.test.inclusions=**/*.spec.ts
+sonar.exclusions=**/*.spec.ts
+sonar.javascript.lcov.reportPaths=coverage/lancerosfm/lcov.info
+```
+
+Con ese archivo en la raíz, `npm run test:coverage` seguido de `npx sonar-scanner` publica el análisis con la cobertura.
 
 ---
 

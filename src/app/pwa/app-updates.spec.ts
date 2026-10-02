@@ -2,7 +2,7 @@ import { DOCUMENT, signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { SwUpdate, VersionEvent } from '@angular/service-worker';
 import { Subject } from 'rxjs';
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { RadioPlayer } from '../player/radio-player';
 import { ToastQueue } from '../toasts/toast-queue';
@@ -150,5 +150,84 @@ describe('AppUpdates', () => {
 
     expect(disabled.activateUpdate).not.toHaveBeenCalled();
     expect(otherReload).not.toHaveBeenCalled();
+  });
+
+  it('ignora los demás avisos del service worker', () => {
+    updates.versionUpdates.next({ type: 'VERSION_DETECTED', version: { hash: 'nueva' } });
+    fakeDocument.hide();
+
+    expect(updates.activateUpdate).not.toHaveBeenCalled();
+  });
+
+  it('si falla la activación, lo intenta de nuevo la próxima vez que se oculte', async () => {
+    updates.activateUpdate.mockRejectedValueOnce(new Error('caché ocupada'));
+    updates.announceVersionReady();
+    fakeDocument.hide();
+    await vi.waitFor(() => expect(updates.activateUpdate).toHaveBeenCalledTimes(1));
+    await Promise.resolve();
+    expect(reload).not.toHaveBeenCalled();
+
+    fakeDocument.hide();
+    await vi.waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+    expect(updates.activateUpdate).toHaveBeenCalledTimes(2);
+  });
+
+  describe('revisión periódica', () => {
+    const SIX_HOURS = 6 * 60 * 60 * 1000;
+
+    beforeEach(() => {
+      // El servicio del bloque exterior ya arrancó con temporizadores reales;
+      // este necesita los falsos desde antes de `start()`.
+      TestBed.resetTestingModule();
+      vi.useFakeTimers();
+      updates = new FakeSwUpdate();
+      configure({ updates, document: createFakeDocument(), reload, playing });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('busca una versión nueva cada seis horas', () => {
+      vi.advanceTimersByTime(SIX_HOURS - 1);
+      expect(updates.checkForUpdate).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1);
+      expect(updates.checkForUpdate).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(SIX_HOURS);
+      expect(updates.checkForUpdate).toHaveBeenCalledTimes(2);
+    });
+
+    it('no se cae si la revisión falla por falta de conexión', async () => {
+      updates.checkForUpdate.mockRejectedValueOnce(new Error('sin conexión'));
+
+      await vi.advanceTimersByTimeAsync(SIX_HOURS);
+      expect(updates.checkForUpdate).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(SIX_HOURS);
+      expect(updates.checkForUpdate).toHaveBeenCalledTimes(2);
+    });
+
+    it('deja de revisar cuando se destruye la aplicación', () => {
+      TestBed.resetTestingModule();
+
+      vi.advanceTimersByTime(SIX_HOURS * 2);
+
+      expect(updates.checkForUpdate).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe('RELOAD_PAGE', () => {
+  it('recarga el documento de la aplicación', () => {
+    const location = { reload: vi.fn() };
+    TestBed.configureTestingModule({
+      providers: [{ provide: DOCUMENT, useValue: { location } }],
+    });
+
+    TestBed.inject(RELOAD_PAGE)();
+
+    expect(location.reload).toHaveBeenCalledTimes(1);
   });
 });

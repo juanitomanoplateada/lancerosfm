@@ -8,7 +8,9 @@
     "postbuild": "node -e \"require('node:fs').copyFileSync('dist/lancerosfm/browser/404/index.html','dist/lancerosfm/browser/404.html')\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "format": "prettier --write \"src/**/*.{ts,html,scss}\""
+    "test:coverage": "ng test --watch=false --coverage",
+    "format": "prettier --write \"src/**/*.{ts,html,scss}\"",
+    "lint": "ng lint"
   },
   "private": true,
   "packageManager": "npm@11.17.0",
@@ -28,9 +30,14 @@
     "@angular/build": "^22.1.8",
     "@angular/cli": "^22.1.8",
     "@angular/compiler-cli": "^22.1.0",
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.11",
+    "angular-eslint": "22.5.0",
+    "eslint": "^10.9.1",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
+    "typescript-eslint": "8.69.0",
     "vitest": "^4.0.8"
   }
 }

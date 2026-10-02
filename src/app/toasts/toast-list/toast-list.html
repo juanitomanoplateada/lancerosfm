@@ -1,4 +1,4 @@
-<div class="toasts" role="status" aria-live="polite">
+<output class="toasts" aria-live="polite">
   @for (toast of toasts(); track toast.id) {
     <div class="toast" [class]="'toast--' + toast.type">
       <p class="toast__message">{{ toast.message }}</p>
@@ -23,4 +23,4 @@
       </button>
     </div>
   }
-</div>
+</output>

@@ -13,8 +13,8 @@ const SHARE_TEXT = `Escucha ${STATION.fullName} en vivo, la emisora de ${STATION
  *
  * Son enlaces directos y no la hoja nativa de compartir del celular: funcionan
  * igual en cualquier navegador, incluso antes de que cargue JavaScript, y
- * WhatsApp —por donde se mueve casi todo— queda a un toque en lugar de
- * escondido en una lista de aplicaciones.
+ * WhatsApp —por donde se comparte casi cualquier cosa— queda a un toque en
+ * lugar de escondido en una lista de aplicaciones.
  */
 @Component({
   selector: 'app-share-station',

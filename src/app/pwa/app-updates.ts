@@ -22,7 +22,7 @@ export const RELOAD_PAGE = new InjectionToken<() => void>('Recargar la página',
   },
 });
 
-/** Cada seis horas, para quien deja la emisora puesta todo el día. */
+/** Cada seis horas, para quien deja la emisora puesta el día entero. */
 const CHECK_INTERVAL = 6 * 60 * 60 * 1000;
 
 /**

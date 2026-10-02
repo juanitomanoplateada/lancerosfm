@@ -63,7 +63,7 @@ export class PlayerBar {
   constructor() {
     if (!this.isBrowser) return;
 
-    const query = window.matchMedia(COMPACT_WIDTH);
+    const query = globalThis.matchMedia(COMPACT_WIDTH);
     this.isCompact.set(query.matches);
     query.addEventListener('change', (event) => {
       this.isCompact.set(event.matches);

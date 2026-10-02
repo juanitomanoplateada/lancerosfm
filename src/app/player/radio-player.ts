@@ -13,7 +13,7 @@ const RETRY_DELAYS = [1_000, 2_000, 4_000, 8_000, 15_000] as const;
 const MAX_RETRIES = 5;
 
 /**
- * Todo el audio de la aplicación pasa por aquí: es el único punto que toca el
+ * El audio de la aplicación entera pasa por aquí: es el único punto que toca el
  * `HTMLAudioElement` y el único que habla con el canal de metadatos.
  *
  * Tres comportamientos que en una emisora importan:
@@ -63,8 +63,8 @@ export class RadioPlayer implements OnDestroy {
     this.connectMetadata();
 
     // Al volver la conexión se retoma sin que el oyente tenga que hacer nada.
-    window.addEventListener('online', this.handleOnline);
-    window.addEventListener('offline', this.handleOffline);
+    globalThis.addEventListener('online', this.handleOnline);
+    globalThis.addEventListener('offline', this.handleOffline);
   }
 
   // --- Controles ----------------------------------------------------------
@@ -107,7 +107,7 @@ export class RadioPlayer implements OnDestroy {
   }
 
   toggleMute(): void {
-    this.setVolume(this.currentVolume() > 0 ? 0 : this.volumeBeforeMute || DEFAULT_VOLUME);
+    this.setVolume(this.currentVolume() > 0 ? 0 : this.volumeBeforeMute);
   }
 
   // --- Audio --------------------------------------------------------------
@@ -213,8 +213,6 @@ export class RadioPlayer implements OnDestroy {
   // --- Metadatos ----------------------------------------------------------
 
   private connectMetadata(): void {
-    if (this.metadataSource) return;
-
     try {
       const source = new EventSource(STATION.stream.metadata);
       source.addEventListener('message', this.handleMetadataMessage);
@@ -316,7 +314,7 @@ export class RadioPlayer implements OnDestroy {
     if (this.metadataTimer) clearTimeout(this.metadataTimer);
     this.releaseAudio();
     this.metadataSource?.close();
-    window.removeEventListener('online', this.handleOnline);
-    window.removeEventListener('offline', this.handleOffline);
+    globalThis.removeEventListener('online', this.handleOnline);
+    globalThis.removeEventListener('offline', this.handleOffline);
   }
 }

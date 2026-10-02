@@ -6,8 +6,8 @@ import { Home } from './pages/home/home';
  * Las URL van en español porque son contenido: las leen los oyentes y las
  * indexan los buscadores. El código, en inglés.
  *
- * La portada va sin carga diferida a propósito: es la página a la que llega casi
- * todo el mundo y no tiene sentido pedir un fragmento aparte para ella.
+ * La portada va sin carga diferida a propósito: es la página a la que llega la
+ * mayoría de la gente y no tiene sentido pedir un fragmento aparte para ella.
  */
 export const routes: Routes = [
   {
