@@ -8,8 +8,16 @@
 
 <app-site-footer />
 
-<!-- La barra vive fuera del router: al cambiar de página la música no se corta. -->
+<!-- La barra vive fuera del router: al cambiar de página la música no se corta.
+     En el celular se apoya sobre la fila de pestañas. -->
 <app-player-bar />
+<app-tab-bar />
 
-<app-floating-contact />
+<!-- La burbuja de contacto no hace falta para pintar la página, y en la portada
+     y en el celular ni siquiera se ve: su código se pide cuando el navegador
+     queda libre, y así no le resta al arranque del reproductor. -->
+@defer (on idle) {
+  <app-floating-contact />
+}
+
 <app-toast-list />

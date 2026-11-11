@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 
+import { WhatsappIcon } from '../../icons/whatsapp-icon';
 import { PageHeader } from '../../layout/page-header/page-header';
 import { PageMetadata } from '../../seo/page-metadata';
 import { breadcrumbSchema } from '../../seo/structured-data';
@@ -7,7 +8,7 @@ import { STATION, WHATSAPP_URL } from '../../station/station';
 
 @Component({
   selector: 'app-contact',
-  imports: [PageHeader],
+  imports: [PageHeader, WhatsappIcon],
   templateUrl: './contact.html',
   styleUrl: './contact.scss',
 })

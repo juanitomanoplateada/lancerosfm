@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.recent {
+  text-align: left;
+}
+
+.recent__heading {
+  margin-bottom: var(--sp-2);
+  color: var(--color-secondary-text);
+  font-family: var(--font-base);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.recent__list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.recent__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);
+}
+
+.recent__item + .recent__item {
+  border-top: 1px solid var(--border);
+}
+
+/* Las cifras de la hora ocupan todas lo mismo, y así las horas quedan
+   alineadas una debajo de otra. */
+.recent__time {
+  flex-shrink: 0;
+  color: var(--color-gray);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.recent__track {
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+.recent__artist {
+  color: var(--color-primary);
+}
+
+/* En el celular el artista y la canción van en dos renglones, uno debajo del
+   otro: en una columna estrecha, el punto que los separa quedaba colgando al
+   final de la primera línea. Desde que cabe todo en una línea vuelven a ir
+   juntos. */
+.recent__track {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent__artist {
+  font-weight: 700;
+}
+
+.recent__sep {
+  display: none;
+}
+
+@media (min-width: 30rem) {
+  .recent__track {
+    display: block;
+  }
+
+  .recent__sep {
+    display: inline;
+  }
+}
+
+.recent__request {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: var(--tap-target);
+  padding-inline: var(--sp-3);
+  border-radius: var(--btn-radius);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.recent__request:hover {
+  background: var(--color-secondary-soft);
+  color: var(--color-secondary-text);
+}

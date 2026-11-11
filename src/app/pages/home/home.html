@@ -1,38 +1,16 @@
-<!-- El reproductor es lo primero de la página: quien entra solo quiere darle
-     play, no navegar. El resto va después. -->
+<!-- Primera pantalla: solo lo que hace falta para escuchar. El botón de
+     reproducir, qué suena y, aparte, pedir una canción. El título queda para
+     buscadores y lectores de pantalla —la cabecera y el logo ya dicen de quién
+     es esto—. Todo lo demás va debajo, y el bloque ocupa la pantalla entera
+     para que de entrada no asome nada de eso. -->
 <section class="live-player" aria-labelledby="live-heading">
-  <div class="container live-player__container">
-    <header class="live-player__header">
-      <h1 id="live-heading" class="live-player__title">
-        <svg
-          class="live-player__title-icon"
-          [class.is-playing]="isPlaying()"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
-          <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
-          <circle cx="12" cy="12" r="2" />
-          <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
-          <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1" />
-        </svg>
-        <span>{{ station.fullName }} en vivo</span>
-      </h1>
+  <div class="container live-player__layout">
+    <h1 id="live-heading" class="visually-hidden">{{ station.fullName }} en vivo</h1>
 
-      <span class="live-player__rule" aria-hidden="true"></span>
-
-      <p class="live-player__subtitle">
-        Emisora comunitaria de
-        <strong>{{ station.address.city }}, {{ station.address.region }}</strong>
-      </p>
-    </header>
-
+    <!-- Mientras este botón se ve casi entero, la barra fija se aparta:
+         `appLivePlayerAnchor` es quien le avisa. -->
     <button
+      appLivePlayerAnchor
       type="button"
       class="tune"
       [attr.aria-label]="isPlaying() ? 'Pausar la emisora' : 'Escuchar la emisora en vivo'"
@@ -43,12 +21,12 @@
           <source
             type="image/avif"
             srcset="/img/logo-256.avif 256w, /img/logo-512.avif 512w"
-            sizes="(max-width: 32.25rem) 62vw, 320px"
+            sizes="(max-width: 32.25rem) 62vw, 352px"
           />
           <source
             type="image/webp"
             srcset="/img/logo-256.webp 256w, /img/logo-512.webp 512w"
-            sizes="(max-width: 32.25rem) 62vw, 320px"
+            sizes="(max-width: 32.25rem) 62vw, 352px"
           />
           <img
             class="tune__image"
@@ -110,81 +88,116 @@
         <span class="tune__now-label">Sin conexión con la emisora</span>
         <span class="tune__now-track">Revisa tu internet y vuelve a intentarlo.</span>
       } @else if (track().title) {
-        <span class="tune__now-label">{{
-          isPlaying() ? 'Sonando ahora' : 'Ahora en la 94.1'
-        }}</span>
+        <span class="tune__now-label">
+          <span class="tune__eq" [class.is-playing]="isPlaying()" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
+          {{ isPlaying() ? 'Sonando ahora' : 'Ahora en la 94.1' }}
+        </span>
         <span class="tune__now-track">
           @if (track().artist) {
-            <b>{{ track().artist }}</b> ·
+            <b class="tune__now-artist">{{ track().artist }}</b
+            ><span class="tune__now-sep" aria-hidden="true"> · </span>
           }
-          {{ track().title }}
+          <span class="tune__now-title">{{ track().title }}</span>
         </span>
       } @else {
         <span class="tune__now-track">Transmitimos las 24 horas, todos los días.</span>
       }
     </p>
+
+    <a
+      class="btn btn--ghost live-player__request"
+      [href]="whatsappUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <app-whatsapp-icon class="live-player__request-icon" />
+      Pedir una canción
+    </a>
   </div>
 </section>
 
-<section class="section section--diferida" aria-labelledby="on-air-heading">
-  <div class="container">
-    <h2 id="on-air-heading">Lo que suena en la 94.1</h2>
-    <p class="section__lead">
-      Música popular, vallenato, rancheras y baladas, mezclado con los avisos, los saludos y las
-      noticias de
-      {{ station.address.city }}. La emisora acompaña el día de la casa, del trabajo en el campo y
-      del viaje a Tunja.
-    </p>
+<!-- Lo que ya sonó va justo debajo de la primera pantalla, no dentro de ella, y
+     solo existe cuando ya ha terminado alguna canción: al entrar todavía no hay
+     nada que listar, y su código se pide cuando llega la primera. -->
+@defer (when hasRecentTracks()) {
+  <div class="container container--narrow recent-block">
+    <app-recent-tracks />
+  </div>
+}
 
-    <div class="cards">
-      <article class="card">
-        <h3>Pide tu canción</h3>
-        <p>
-          Escríbenos por WhatsApp con la canción y el saludo que quieres mandar. Lo ponemos al aire.
-        </p>
+<!-- En pantallas anchas el formulario ocupa la columna derecha entera, y a la
+     izquierda quedan la presentación y la otra tarjeta. En el celular se apilan
+     tal como vienen: presentación, formulario y tarjeta. -->
+<section class="section section--diferida" aria-labelledby="on-air-heading">
+  <div class="container on-air">
+    <div class="on-air__intro">
+      <h2 id="on-air-heading">Lo que suena en la 94.1</h2>
+      <p class="section__lead">
+        Música popular, vallenato, rancheras y baladas, mezclado con los avisos, los saludos y las
+        noticias de
+        {{ station.address.city }}. La emisora acompaña el día de la casa, del trabajo en el campo y
+        del viaje a Tunja.
+      </p>
+    </div>
+
+    <article class="card on-air__request">
+      <h3>Pide tu canción</h3>
+      <p>
+        Dinos qué canción quieres oír y a quién va el saludo. Te dejamos el mensaje listo para
+        enviarlo por WhatsApp, y lo ponemos al aire.
+      </p>
+      <!-- El formulario queda debajo de la primera pantalla y se pide cuando el
+           navegador queda libre. Mientras llega —y si el JavaScript no cargara—
+           está el enlace directo a WhatsApp, que es lo que había antes. -->
+      @defer (on idle) {
+        <app-song-request class="on-air__form" />
+      } @placeholder {
         <a class="btn btn--whatsapp" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
           Pedir por WhatsApp
         </a>
-      </article>
+      }
+    </article>
 
-      <article class="card">
-        <h3>Escúchanos donde estés</h3>
-        <p>
-          En {{ station.frequency }} si estás en {{ station.address.region }}, y por internet desde
-          cualquier ciudad o país.
-        </p>
-        <a class="btn btn--ghost" routerLink="/como-escuchar">Cómo escucharnos</a>
-      </article>
-    </div>
+    <article class="card on-air__listen">
+      <h3>Escúchanos donde estés</h3>
+      <p>
+        En {{ station.frequency }} si estás en {{ station.address.region }}, y por internet desde
+        cualquier ciudad o país.
+      </p>
+      <a class="btn btn--ghost" routerLink="/como-escuchar">Cómo escucharnos</a>
+    </article>
   </div>
 </section>
 
-<section class="section section--quiet section--diferida" aria-labelledby="about-heading">
-  <div class="container container--narrow">
-    <h2 id="about-heading">La emisora de {{ station.address.city }}</h2>
-    <p>
-      Lanceros Stereo transmite en {{ station.frequency }} desde {{ station.address.city }},
-      {{ station.address.region }}, en la Provincia Centro, a 26 kilómetros de Tunja. Es una emisora
-      comunitaria: la programación se hace con la gente del municipio y para la gente del municipio.
-    </p>
-    <p>
-      Esta página existe sobre todo para quien escucha fuera del alcance de la señal — los que se
-      fueron a trabajar a otra ciudad, la familia en el exterior, o quien sencillamente anda con el
-      celular en la mano.
-    </p>
-    <a class="btn btn--ghost" routerLink="/nosotros">Conocer la emisora</a>
-  </div>
-</section>
+<!-- Las dos van juntas porque una lleva a la otra: después de contar que la
+     página es para quien está lejos, al oyente se le ocurre a quién mandársela. -->
+<div class="section section--quiet section--diferida">
+  <div class="container home-duo">
+    <section class="prose" aria-labelledby="about-heading">
+      <h2 id="about-heading">La emisora de {{ station.address.city }}</h2>
+      <p>
+        Lanceros Stereo transmite en {{ station.frequency }} desde {{ station.address.city }},
+        {{ station.address.region }}, en la Provincia Centro, a 26 kilómetros de Tunja. Es una
+        emisora comunitaria: la programación se hace con la gente del municipio y para la gente del
+        municipio.
+      </p>
+      <p>
+        Esta página existe sobre todo para quien escucha fuera del alcance de la señal — los que se
+        fueron a trabajar a otra ciudad, la familia en el exterior, o quien sencillamente anda con
+        el celular en la mano.
+      </p>
+      <a class="btn btn--ghost" routerLink="/nosotros">Conocer la emisora</a>
+    </section>
 
-<!-- Va justo después de contar que la página es para quien está lejos: es el
-     momento en que al oyente se le ocurre a quién mandársela. -->
-<section class="section section--diferida" aria-labelledby="share-heading">
-  <div class="container container--narrow">
-    <h2 id="share-heading">Compártela con quien está lejos</h2>
-    <p class="section__lead">
-      Por internet la emisora se escucha desde cualquier ciudad o país. Si tienes familia o amigos
-      fuera de {{ station.address.city }}, mándales el enlace.
-    </p>
-    <app-share-station class="share-actions" />
+    <section aria-labelledby="share-heading">
+      <h2 id="share-heading">Compártela con quien está lejos</h2>
+      <p class="section__lead">
+        Por internet la emisora se escucha desde cualquier ciudad o país. Si tienes familia o amigos
+        fuera de {{ station.address.city }}, mándales el enlace.
+      </p>
+      <app-share-station class="share-actions" />
+    </section>
   </div>
-</section>
+</div>

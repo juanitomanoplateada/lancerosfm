@@ -1,26 +1,33 @@
 <header class="navbar">
   <div class="container navbar__inner">
-    <a routerLink="/" class="navbar__logo" aria-label="Lanceros Stereo 94.1 FM, ir al inicio">
-      Lanceros Stereo <span class="navbar__logo-highlight">94.1 FM</span>
-    </a>
+    <div class="navbar__brand">
+      <a routerLink="/" class="navbar__logo" aria-label="Lanceros Stereo 94.1 FM, ir al inicio">
+        Lanceros Stereo <span class="navbar__logo-highlight">94.1 FM</span>
+      </a>
 
-    @if (isPlaying()) {
-      <p class="navbar__on-air">
-        <span class="navbar__on-air-dot" aria-hidden="true"></span>
-        Al aire
-      </p>
-    }
+      @if (isPlaying()) {
+        <p class="navbar__on-air">
+          <span class="navbar__on-air-dot" aria-hidden="true"></span>
+          <span class="navbar__on-air-label">Al aire</span>
+        </p>
+      }
+    </div>
 
+    <!-- En el celular esta lista no se ve: la misma navegación baja a la fila
+         de pestañas (`app-tab-bar`). -->
     <nav class="navbar__nav" aria-label="Navegación principal">
       <ul>
-        <li>
-          <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }"
-            >Inicio</a
-          >
-        </li>
-        <li><a routerLink="/como-escuchar" routerLinkActive="is-active">Cómo escuchar</a></li>
-        <li><a routerLink="/nosotros" routerLinkActive="is-active">Nosotros</a></li>
-        <li><a routerLink="/contacto" routerLinkActive="is-active">Contacto</a></li>
+        @for (item of items; track item.path) {
+          <li>
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="is-active"
+              ariaCurrentWhenActive="page"
+              [routerLinkActiveOptions]="{ exact: item.exact }"
+              >{{ item.label }}</a
+            >
+          </li>
+        }
       </ul>
     </nav>
   </div>

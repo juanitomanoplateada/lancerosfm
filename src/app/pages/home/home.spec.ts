@@ -1,11 +1,12 @@
 import { computed, PLATFORM_ID, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { DeferBlockState, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { LivePlayerPresence } from '../../player/live-player-presence';
 import { RadioPlayer } from '../../player/radio-player';
-import { PlayerState, Track } from '../../player/track';
+import { PlayedTrack, PlayerState, Track } from '../../player/track';
 import { WHATSAPP_URL } from '../../station/station';
 import { Home } from './home';
 
@@ -13,6 +14,7 @@ import { Home } from './home';
 class FakeRadioPlayer {
   readonly state = signal<PlayerState>('stopped');
   readonly track = signal<Track>({ artist: '', title: '' });
+  readonly recentTracks = signal<readonly PlayedTrack[]>([]);
   readonly isPlaying = computed(() => this.state() === 'playing');
   readonly isBusy = computed(() => this.state() === 'loading' || this.state() === 'reconnecting');
   readonly hasFailed = computed(() => this.state() === 'error');
@@ -39,12 +41,16 @@ describe('Home', () => {
 
   async function open(url = '/', platform = 'browser'): Promise<void> {
     TestBed.configureTestingModule({
+      // La portada trae piezas de carga diferida: se declara aquí y se compila
+      // antes de abrirla para que TestBed las tenga resueltas.
+      imports: [Home],
       providers: [
         provideRouter([{ path: '', component: Home }]),
         { provide: RadioPlayer, useValue: player },
         { provide: PLATFORM_ID, useValue: platform },
       ],
     });
+    await TestBed.compileComponents();
     harness = await RouterTestingHarness.create();
     await harness.navigateByUrl(url, Home);
   }
@@ -52,6 +58,13 @@ describe('Home', () => {
   async function settle(): Promise<void> {
     harness.detectChanges();
     await harness.fixture.whenStable();
+  }
+
+  /** Trae las piezas de carga diferida, como hace el navegador en cuanto queda libre. */
+  async function loadDeferred(): Promise<void> {
+    for (const block of await harness.fixture.getDeferBlocks()) {
+      await block.render(DeferBlockState.Complete);
+    }
   }
 
   beforeEach(() => {
@@ -130,6 +143,39 @@ describe('Home', () => {
       expect(nowPlaying('track')).toBe('Cuña institucional');
     });
 
+    it('pone el artista y la canción cada uno en su renglón', async () => {
+      await open();
+
+      player.track.set({ artist: 'Los Hispanos', title: 'Boquita de caramelo' });
+      await settle();
+
+      expect(host().querySelector('.tune__now-artist')?.textContent).toBe('Los Hispanos');
+      expect(host().querySelector('.tune__now-title')?.textContent).toBe('Boquita de caramelo');
+    });
+
+    it('deja solo el título cuando lo que suena no trae artista', async () => {
+      await open();
+
+      player.track.set({ artist: '', title: 'Cuña institucional' });
+      await settle();
+
+      expect(host().querySelector('.tune__now-artist')).toBeNull();
+      expect(host().querySelector('.tune__now-title')?.textContent).toBe('Cuña institucional');
+    });
+
+    it('mueve el ecualizador solo mientras suena', async () => {
+      await open();
+      player.track.set({ artist: 'Los Hispanos', title: 'Boquita de caramelo' });
+      await settle();
+      const equalizer = () => host().querySelector('.tune__eq')!;
+      expect(equalizer().getAttribute('aria-hidden')).toBe('true');
+      expect(equalizer().classList).not.toContain('is-playing');
+
+      player.state.set('playing');
+      await settle();
+      expect(equalizer().classList).toContain('is-playing');
+    });
+
     it('explica qué hacer si no hay conexión', async () => {
       await open();
 
@@ -144,8 +190,72 @@ describe('Home', () => {
   it('lleva a pedir canciones por WhatsApp con el mensaje ya escrito', async () => {
     await open();
 
-    const whatsapp = host().querySelector<HTMLAnchorElement>('.btn--whatsapp')!;
-    expect(whatsapp.href).toBe(WHATSAPP_URL);
+    const request = host().querySelector<HTMLAnchorElement>('.live-player__request')!;
+    expect(request.href).toBe(WHATSAPP_URL);
+    expect(request.textContent).toContain('Pedir una canción');
+  });
+
+  describe('primera pantalla', () => {
+    it('deja el título para los buscadores y los lectores de pantalla, sin mostrarlo', async () => {
+      await open();
+
+      const title = host().querySelector('h1')!;
+      expect(title.textContent).toBe('Lanceros Stereo 94.1 FM en vivo');
+      expect(title.classList).toContain('visually-hidden');
+    });
+
+    it('muestra solo reproducir, qué suena y pedir una canción', async () => {
+      await open();
+
+      const screen = host().querySelector<HTMLElement>('.live-player__layout')!;
+      const visible = [...screen.children]
+        .filter((child) => !child.classList.contains('visually-hidden'))
+        .map((child) => child.className.split(' ')[0]);
+
+      expect(visible).toEqual(['tune', 'tune__now', 'btn']);
+    });
+
+    it('pone la lista de lo que ya sonó fuera de ella, debajo', async () => {
+      await open();
+      player.recentTracks.set([{ artist: 'Jorge Celedón', title: 'Ay hombe', startedAt: 0 }]);
+      await settle();
+
+      const list = host().querySelector('app-recent-tracks')!;
+      expect(host().querySelector('.live-player')?.contains(list)).toBe(false);
+    });
+  });
+
+  describe('junto al reproductor', () => {
+    it('no pide la lista de canciones hasta que termina la primera', async () => {
+      await open();
+      expect(host().querySelector('app-recent-tracks')).toBeNull();
+
+      player.recentTracks.set([{ artist: 'Jorge Celedón', title: 'Ay hombe', startedAt: 0 }]);
+      await settle();
+
+      expect(host().querySelector('.recent__item')?.textContent).toContain('Ay hombe');
+    });
+  });
+
+  describe('tarjeta «Pide tu canción»', () => {
+    function card(): HTMLElement {
+      return host().querySelector<HTMLElement>('.on-air__request')!;
+    }
+
+    it('ofrece el enlace directo a WhatsApp mientras llega el formulario', async () => {
+      await open();
+
+      expect(card().querySelector('h3')?.textContent).toBe('Pide tu canción');
+      expect(card().querySelector<HTMLAnchorElement>('a.btn--whatsapp')?.href).toBe(WHATSAPP_URL);
+      expect(card().querySelector('input')).toBeNull();
+    });
+
+    it('trae el formulario para pedir una canción con su saludo', async () => {
+      await open();
+      await loadDeferred();
+
+      expect(card().querySelectorAll('app-song-request input')).toHaveLength(3);
+    });
   });
 
   describe('atajo «Escuchar en vivo» de la aplicación instalada', () => {
@@ -165,6 +275,34 @@ describe('Home', () => {
       await open('/?play=1', 'server');
 
       expect(player.play).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('barra fija', () => {
+    /** El observador mínimo para saber qué elemento se queda vigilando la portada. */
+    class WatchedElements {
+      static readonly all: Element[] = [];
+
+      observe(element: Element): void {
+        WatchedElements.all.push(element);
+      }
+
+      disconnect(): void {
+        WatchedElements.all.length = 0;
+      }
+    }
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('le avisa de que el botón grande está a la vista, para que se aparte', async () => {
+      vi.stubGlobal('IntersectionObserver', WatchedElements);
+
+      await open();
+
+      expect(TestBed.inject(LivePlayerPresence).onScreen()).toBe(true);
+      expect(WatchedElements.all).toEqual([tuneButton()]);
     });
   });
 });

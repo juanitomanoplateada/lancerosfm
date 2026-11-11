@@ -38,6 +38,10 @@ describe('Contact', () => {
     expect(highlight.textContent).toContain('WhatsApp 310 268 8737');
   });
 
+  it('mantiene el número de WhatsApp en una sola pieza, sin partirlo entre renglones', () => {
+    expect(host.querySelector('.highlight__number')?.textContent).toBe('310 268 8737');
+  });
+
   it('da teléfono, correo y dirección', () => {
     expect(host.querySelector('a[href="tel:+573102688737"]')).not.toBeNull();
     expect(host.querySelector('a[href="mailto:radiolanceros@hotmail.com"]')).not.toBeNull();

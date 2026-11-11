@@ -18,6 +18,10 @@
 
 html {
   scroll-behavior: smooth;
+
+  /* Donde la cabecera va fija, un salto a un ancla tiene que parar debajo de
+     ella y no detrás. */
+  scroll-padding-top: var(--sticky-header-h);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -34,9 +38,9 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 
-  /* La barra del reproductor es fija: el contenido necesita ese colchón para
-     que nada quede escondido detrás al final de la página. */
-  padding-bottom: calc(var(--player-bar-h) + env(safe-area-inset-bottom, 0px));
+  /* La barra del reproductor y las pestañas son fijas: el contenido necesita
+     ese colchón para que nada quede escondido detrás al final de la página. */
+  padding-bottom: calc(var(--bottom-chrome-h) + env(safe-area-inset-bottom, 0px));
 }
 
 img,

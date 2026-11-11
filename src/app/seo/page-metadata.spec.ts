@@ -26,6 +26,41 @@ describe('PageMetadata', () => {
     expect(document.title).toBe('Contacto | Lanceros Stereo 94.1 FM');
   });
 
+  describe('mientras suena la emisora', () => {
+    it('pone la canción en la pestaña, por delante del nombre de la emisora', () => {
+      pageMetadata.setPage({ path: '/contacto', title: 'Contacto', description: 'x' });
+
+      pageMetadata.setNowPlaying('Jorge Celedón – Ay hombe');
+
+      expect(document.title).toBe('▶ Jorge Celedón – Ay hombe · Lanceros Stereo 94.1 FM');
+    });
+
+    it('la mantiene al cambiar de página y devuelve el título al pausar', () => {
+      pageMetadata.setNowPlaying('Ay hombe');
+      pageMetadata.setPage({ path: '/nosotros', title: 'Nosotros', description: 'x' });
+      expect(document.title).toBe('▶ Ay hombe · Lanceros Stereo 94.1 FM');
+
+      pageMetadata.setNowPlaying('');
+      expect(document.title).toBe('Nosotros | Lanceros Stereo 94.1 FM');
+    });
+
+    it('no toca las etiquetas sociales, que siguen describiendo la página', () => {
+      pageMetadata.setPage({ path: '/contacto', title: 'Contacto', description: 'x' });
+
+      pageMetadata.setNowPlaying('Ay hombe');
+
+      expect(metaContent('meta[property="og:title"]')).toBe('Contacto | Lanceros Stereo 94.1 FM');
+    });
+
+    it('no deja la pestaña en blanco si avisan de que no suena nada antes de haber página', () => {
+      document.title = 'Título del HTML';
+
+      pageMetadata.setNowPlaying('');
+
+      expect(document.title).toBe('Título del HTML');
+    });
+  });
+
   it('deja una sola descripción al cambiar de página', () => {
     pageMetadata.setPage({ path: '/', title: 'A', description: 'Primera' });
     pageMetadata.setPage({ path: '/contacto', title: 'B', description: 'Segunda' });

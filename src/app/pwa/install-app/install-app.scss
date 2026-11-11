@@ -1,0 +1,37 @@
+:host {
+  display: grid;
+  gap: var(--sp-2);
+  justify-items: start;
+}
+
+p {
+  margin: 0;
+}
+
+.install__hint {
+  color: var(--color-gray);
+  font-size: var(--text-sm);
+}
+
+.install__done {
+  color: var(--color-secondary-text);
+  font-weight: 600;
+}
+
+/* Los pasos van numerados: en el iPhone hay que hacerlos en ese orden. */
+.install__steps {
+  display: grid;
+  gap: var(--sp-2);
+  padding-left: var(--sp-5);
+  list-style: decimal;
+}
+
+/* El dibujo del botón que hay que buscar, del tamaño de la letra y en su
+   renglón, para reconocerlo en la pantalla del teléfono. */
+.install__icon {
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  color: var(--color-primary);
+  vertical-align: -0.25em;
+}

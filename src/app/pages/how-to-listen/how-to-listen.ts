@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { PageHeader } from '../../layout/page-header/page-header';
+import { InstallApp } from '../../pwa/install-app/install-app';
 import { PageMetadata } from '../../seo/page-metadata';
 import { breadcrumbSchema } from '../../seo/structured-data';
 import { STATION, WHATSAPP_URL } from '../../station/station';
@@ -21,7 +22,7 @@ interface Faq {
  */
 @Component({
   selector: 'app-how-to-listen',
-  imports: [PageHeader, RouterLink],
+  imports: [PageHeader, RouterLink, InstallApp],
   templateUrl: './how-to-listen.html',
   styleUrl: './how-to-listen.scss',
 })

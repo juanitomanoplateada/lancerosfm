@@ -8,6 +8,12 @@ export interface Track {
   title: string;
 }
 
+/** Canción que ya pasó, con el momento en que empezó a sonar. */
+export interface PlayedTrack extends Track {
+  /** Milisegundos desde la época, como `Date.now()`. */
+  startedAt: number;
+}
+
 /** Lo que llega por el canal SSE de Zeno. */
 export interface StreamMetadata {
   streamTitle?: string;

@@ -7,9 +7,9 @@
    reconoce a Lanceros Stereo.
 
    Lo único que se añadió es una variante más oscura del verde para cuando hace
-   de texto sobre blanco: el #008b5e institucional se queda en 4,06:1 y no
-   alcanza el mínimo legible. Como gráfico —subrayados, ondas, iconos— se usa
-   el verde institucional tal cual. */
+   de texto sobre blanco, o de fondo de un texto blanco: el #008b5e
+   institucional se queda en 4,06:1 y no alcanza el mínimo legible. Como
+   gráfico —subrayados, ondas, iconos— se usa el verde institucional tal cual. */
 
 :root {
   /* --- Marca --- */
@@ -23,6 +23,16 @@
   --color-secondary-soft: #e3f3ec;
   --color-bar: #111b2d;
   --color-bar-control: #1a263d;
+
+  /* --- WhatsApp ---
+     No son colores de la emisora, sino los de la aplicación: el claro es el
+     que la gente reconoce de un vistazo y lleva tinta oscura; el oscuro es para
+     cuando encima va texto blanco. */
+  --color-whatsapp: #25d366;
+  --color-whatsapp-hover: #1fbe5b;
+  --color-whatsapp-ink: #04310f;
+  --color-whatsapp-strong: #0e7a41;
+  --color-whatsapp-strong-hover: #0c6a38;
 
   /* --- Superficies --- */
   --color-white: #ffffff;
@@ -82,19 +92,58 @@
   --container: 68rem;
   --container-narrow: 46rem;
 
-  /* Alto de la barra del reproductor. El layout reserva este espacio para que
-     la barra nunca tape el final del contenido. */
+  /* Alto de la cabecera, y cuánto de ella se queda fijo arriba al bajar por la
+     página: todo en pantallas anchas, nada donde la cabecera no va fija. Los
+     saltos a un ancla lo descuentan para no dejar el destino tapado. */
+  --header-h: 4rem;
+  --sticky-header-h: var(--header-h);
+
+  /* Lo que va fijo abajo: la barra del reproductor y, en el celular, la fila de
+     pestañas debajo de ella. El layout reserva la suma para que nada tape el
+     final del contenido. */
   --player-bar-h: 72px;
+  --tab-bar-h: 0px;
+  --bottom-chrome-h: calc(var(--player-bar-h) + var(--tab-bar-h));
 
   /* --- Interacción --- */
   --tap-target: 2.75rem;
+  --tap-target-lg: 3rem;
   --focus-ring: 3px solid var(--color-secondary);
   --transition: 200ms ease;
 
   /* --- Capas --- */
+  --z-header: 900;
   --z-player: 1000;
   --z-float: 2000;
   --z-toast: 3000;
 
   color-scheme: light;
+}
+
+/* Celular: la navegación baja a una fila de pestañas, al alcance del pulgar, y
+   la cabecera se queda en una franja con el nombre que ya no hace falta fijar.
+   El mismo corte de 48rem lo usan los componentes que cambian con él. */
+@media (max-width: 48rem) {
+  :root {
+    --header-h: 3.5rem;
+    --sticky-header-h: 0px;
+    --player-bar-h: 64px;
+    --tab-bar-h: 56px;
+  }
+}
+
+/* Con poca altura —un celular acostado— cada franja fija se come la pantalla:
+   la cabecera se suelta, y en el celular la barra y las pestañas se ponen una al
+   lado de la otra, así que abajo solo se reserva el alto de una. */
+@media (max-height: 30rem) {
+  :root {
+    --sticky-header-h: 0px;
+  }
+}
+
+@media (max-width: 48rem) and (max-height: 30rem) {
+  :root {
+    --player-bar-h: 56px;
+    --bottom-chrome-h: 56px;
+  }
 }

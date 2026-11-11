@@ -16,6 +16,7 @@ class FakeAudio {
   src = '';
   preload = '';
   volume = 1;
+  muted = false;
   readonly play = vi.fn<() => Promise<void>>(() => Promise.resolve());
   readonly pause = vi.fn();
   readonly load = vi.fn();
@@ -525,6 +526,71 @@ describe('RadioPlayer', () => {
     });
   });
 
+  describe('canciones que ya sonaron', () => {
+    function announce(streamTitle: string): void {
+      metadataChannel().emitMessage(JSON.stringify({ streamTitle }));
+    }
+
+    it('arranca sin ninguna: la lista se arma con lo que va sonando', () => {
+      const player = createPlayer();
+
+      announce('Jorge Celedón - Ay hombe');
+
+      expect(player.recentTracks()).toEqual([]);
+    });
+
+    it('guarda la canción que termina, con la hora a la que empezó', () => {
+      const player = createPlayer();
+      vi.setSystemTime(new Date('2026-03-14T10:42:00'));
+      announce('Jorge Celedón - Ay hombe');
+
+      vi.setSystemTime(new Date('2026-03-14T10:46:00'));
+      announce('Darío Gómez - Nadie es eterno');
+
+      expect(player.recentTracks()).toEqual([
+        {
+          artist: 'Jorge Celedón',
+          title: 'Ay hombe',
+          startedAt: new Date('2026-03-14T10:42:00').getTime(),
+        },
+      ]);
+    });
+
+    it('pone la más reciente arriba y no pasa de cinco', () => {
+      const player = createPlayer();
+
+      for (const number of [1, 2, 3, 4, 5, 6, 7]) announce(`Artista ${number} - Canción ${number}`);
+
+      expect(player.recentTracks().map((track) => track.title)).toEqual([
+        'Canción 6',
+        'Canción 5',
+        'Canción 4',
+        'Canción 3',
+        'Canción 2',
+      ]);
+    });
+
+    it('no repite la canción cuando el canal vuelve a mandar el mismo título', () => {
+      const player = createPlayer();
+      announce('Jorge Celedón - Ay hombe');
+      announce('Jorge Celedón - Ay hombe');
+
+      announce('Darío Gómez - Nadie es eterno');
+
+      expect(player.recentTracks()).toHaveLength(1);
+    });
+
+    it('deja fuera las cuñas y los avisos, que no traen artista', () => {
+      const player = createPlayer();
+      announce('Cuña institucional');
+      announce('Alcaldía de Tuta - ');
+
+      announce('Jorge Celedón - Ay hombe');
+
+      expect(player.recentTracks()).toEqual([]);
+    });
+  });
+
   describe('pantalla de bloqueo (MediaSession)', () => {
     let session: FakeMediaSession;
 
@@ -624,6 +690,51 @@ describe('RadioPlayer', () => {
       expect(player.volume()).toBe(0.4);
     });
 
+    it('silencia también por `muted`, que es lo único que respeta el iPhone', () => {
+      const player = createPlayer();
+      player.play();
+      expect(lastAudio().muted).toBe(false);
+
+      player.toggleMute();
+      expect(lastAudio().muted).toBe(true);
+
+      player.toggleMute();
+      expect(lastAudio().muted).toBe(false);
+    });
+
+    it('arranca en silencio si el oyente silenció antes de darle a reproducir', () => {
+      const player = createPlayer();
+      player.toggleMute();
+
+      player.play();
+
+      expect(lastAudio().muted).toBe(true);
+    });
+
+    it('sabe que puede ajustar el volumen donde el navegador lo permite', () => {
+      expect(createPlayer().canSetVolume()).toBe(true);
+    });
+
+    it('sabe que no puede donde el navegador lo ignora, como en el iPhone', () => {
+      // En iOS asignar el volumen no hace nada y al leerlo siempre vale 1.
+      const deafProbe = {
+        get volume() {
+          return 1;
+        },
+        set volume(_value: number) {
+          // Se ignora, igual que en el teléfono.
+        },
+      };
+      const createElement = document.createElement.bind(document);
+      vi.spyOn(document, 'createElement').mockImplementation((tag: string) =>
+        tag === 'audio' ? (deafProbe as HTMLAudioElement) : createElement(tag),
+      );
+
+      expect(createPlayer().canSetVolume()).toBe(false);
+
+      vi.restoreAllMocks();
+    });
+
     it('recuerda el volumen entre visitas', () => {
       createPlayer().setVolume(0.3);
       TestBed.resetTestingModule();
@@ -631,14 +742,37 @@ describe('RadioPlayer', () => {
       expect(createPlayer().volume()).toBe(0.3);
     });
 
-    it('recuerda también el silencio, y al reactivar vuelve al volumen completo', () => {
+    it('no recuerda el silencio: la siguiente visita vuelve con el volumen que se oía', () => {
+      const earlier = createPlayer();
+      earlier.setVolume(0.6);
+      earlier.toggleMute();
+      TestBed.resetTestingModule();
+
+      const player = createPlayer();
+
+      expect(player.isMuted()).toBe(false);
+      expect(player.volume()).toBe(0.6);
+    });
+
+    it('ignora el silencio que dejó guardado una versión anterior', () => {
       storage.setItem('lanceros:volume', '0');
 
       const player = createPlayer();
-      expect(player.isMuted()).toBe(true);
 
-      player.toggleMute();
+      expect(player.isMuted()).toBe(false);
       expect(player.volume()).toBe(1);
+    });
+
+    it('no vuelve casi apagada aunque se haya dejado con el deslizador al mínimo', () => {
+      storage.setItem('lanceros:volume', '0.05');
+
+      const player = createPlayer();
+      expect(player.volume()).toBe(0.2);
+
+      // Ese mismo volumen es al que regresa después de silenciar.
+      player.toggleMute();
+      player.toggleMute();
+      expect(player.volume()).toBe(0.2);
     });
 
     it('descarta un volumen guardado que no tiene sentido', () => {

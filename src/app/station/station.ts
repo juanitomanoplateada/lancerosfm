@@ -56,10 +56,13 @@ export const STATION = {
   },
 } as const;
 
-/** Enlace de WhatsApp con el mensaje de petición ya escrito. */
-export const WHATSAPP_URL = `https://wa.me/${STATION.contact.whatsapp}?text=${encodeURIComponent(
-  STATION.contact.whatsappMessage,
-)}`;
+/** Enlace que abre el WhatsApp de la emisora con un mensaje ya escrito. */
+export function whatsappLink(message: string): string {
+  return `https://wa.me/${STATION.contact.whatsapp}?text=${encodeURIComponent(message)}`;
+}
+
+/** Enlace de WhatsApp con el comienzo de la petición ya escrito. */
+export const WHATSAPP_URL = whatsappLink(STATION.contact.whatsappMessage);
 
 /** Lista plana para `sameAs` de los datos estructurados. */
 export const SOCIAL_PROFILES: readonly string[] = Object.values(STATION.social);

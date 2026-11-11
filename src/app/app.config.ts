@@ -15,6 +15,7 @@ import {
 import { provideServiceWorker } from '@angular/service-worker';
 
 import { routes } from './app.routes';
+import { AppInstall } from './pwa/app-install';
 import { AppUpdates } from './pwa/app-updates';
 
 /**
@@ -43,5 +44,10 @@ export const appConfig: ApplicationConfig = {
       registrationStrategy: 'registerWhenStable:30000',
     }),
     provideAppInitializer(() => inject(AppUpdates).start()),
+
+    // El navegador ofrece instalar la aplicación una sola vez y al poco de
+    // cargar: hay que estar escuchando desde ya, no desde que alguien abra la
+    // página que explica cómo instalarla.
+    provideAppInitializer(() => inject(AppInstall).listen()),
   ],
 };

@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+.request {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.request__field {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.request__field label {
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.request__optional {
+  color: var(--color-gray);
+  font-weight: 400;
+}
+
+/* El borde va en gris oscuro y no en el gris claro de las tarjetas: un campo
+   tiene que distinguirse del fondo aunque la pantalla esté al sol.
+   La letra no baja de 16 px, que es el tamaño por debajo del cual el iPhone
+   acerca la página al tocar el campo. */
+.request__field input {
+  width: 100%;
+  min-height: var(--tap-target-lg);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1.5px solid var(--color-gray);
+  border-radius: var(--btn-radius);
+  background: var(--color-white);
+  color: var(--color-gray-dark);
+  font: inherit;
+  font-size: var(--text-base);
+}
+
+.request__field input::placeholder {
+  color: var(--color-gray);
+  opacity: 1;
+}
+
+.request__field input:hover {
+  border-color: var(--color-primary);
+}
+
+.request__send {
+  justify-self: start;
+}
+
+.request__hint {
+  margin: 0;
+  color: var(--color-gray);
+  font-size: var(--text-xs);
+}
+
+/* En el celular el botón ocupa todo el ancho: es más fácil de acertar con el
+   pulgar que uno pegado a la izquierda. */
+@media (max-width: 30rem) {
+  .request__send {
+    justify-self: stretch;
+  }
+}

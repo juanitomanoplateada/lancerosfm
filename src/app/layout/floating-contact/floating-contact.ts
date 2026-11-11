@@ -3,10 +3,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 
+import { WhatsappIcon } from '../../icons/whatsapp-icon';
 import { STATION, WHATSAPP_URL } from '../../station/station';
+
+const PAGES_WITHOUT_BUBBLE: ReadonlySet<string> = new Set(['/', '/contacto']);
 
 @Component({
   selector: 'app-floating-contact',
+  imports: [WhatsappIcon],
   templateUrl: './floating-contact.html',
   styleUrl: './floating-contact.scss',
   host: {
@@ -31,11 +35,12 @@ export class FloatingContact {
   );
 
   /**
-   * En la portada no aparece: ahí el botón grande de reproducir ocupa el centro
-   * de la pantalla y la burbuja se le montaba encima. La portada ya tiene su
-   * propia tarjeta de «Pedir por WhatsApp», así que no se pierde el acceso.
+   * Hay dos páginas donde sobra. En la portada, el botón grande de reproducir
+   * ocupa el centro de la pantalla y la burbuja se le montaba encima; allí ya
+   * hay una tarjeta de «Pedir por WhatsApp», así que no se pierde el acceso. Y
+   * en la de contacto, todo lo que ofrece el menú está escrito en la página.
    */
-  protected readonly visible = computed(() => this.currentPath() !== '/');
+  protected readonly visible = computed(() => !PAGES_WITHOUT_BUBBLE.has(this.currentPath()));
 
   protected toggle(): void {
     this.isOpen.update((open) => !open);

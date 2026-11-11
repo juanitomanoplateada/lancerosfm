@@ -1,7 +1,7 @@
 .toasts {
   position: fixed;
   right: var(--sp-4);
-  bottom: calc(var(--player-bar-h) + var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bottom-chrome-h) + var(--sp-4) + env(safe-area-inset-bottom, 0px));
   left: var(--sp-4);
   z-index: var(--z-toast);
   display: grid;

@@ -37,7 +37,7 @@ describe('FloatingContact', () => {
     router = TestBed.inject(Router);
     fixture = TestBed.createComponent(FloatingContact);
     fixture.autoDetectChanges();
-    await navigate('/contacto');
+    await navigate('/nosotros');
   });
 
   describe('dónde aparece', () => {
@@ -55,8 +55,14 @@ describe('FloatingContact', () => {
       expect(host().querySelector('.contact')).toBeNull();
     });
 
-    it('aparece en las páginas interiores', async () => {
-      await navigate('/nosotros?origen=menu#equipo');
+    it('tampoco en la de contacto, que ya tiene escrito todo lo que ofrece el menú', async () => {
+      await navigate('/contacto');
+
+      expect(host().querySelector('.contact')).toBeNull();
+    });
+
+    it('aparece en las demás páginas interiores', async () => {
+      await navigate('/como-escuchar?origen=menu#preguntas');
 
       expect(host().querySelector('.contact')).not.toBeNull();
     });

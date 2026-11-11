@@ -4,6 +4,7 @@ import { SwUpdate } from '@angular/service-worker';
 import { describe, expect, it, vi } from 'vitest';
 
 import { appConfig } from './app.config';
+import { AppInstall } from './pwa/app-install';
 import { AppUpdates } from './pwa/app-updates';
 
 describe('appConfig', () => {
@@ -16,6 +17,17 @@ describe('appConfig', () => {
     await TestBed.inject(ApplicationInitStatus).donePromise;
 
     expect(start).toHaveBeenCalledTimes(1);
+  });
+
+  it('empieza a escuchar el aviso de instalación desde el arranque', async () => {
+    const listen = vi.fn();
+    TestBed.configureTestingModule({
+      providers: [...appConfig.providers, { provide: AppInstall, useValue: { listen } }],
+    });
+
+    await TestBed.inject(ApplicationInitStatus).donePromise;
+
+    expect(listen).toHaveBeenCalledTimes(1);
   });
 
   it('no registra el service worker en desarrollo', () => {

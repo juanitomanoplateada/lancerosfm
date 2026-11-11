@@ -1,15 +1,19 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { Component, computed, inject, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { WhatsappIcon } from '../../icons/whatsapp-icon';
+import { LivePlayerAnchor } from '../../player/live-player-anchor';
 import { RadioPlayer } from '../../player/radio-player';
+import { RecentTracks } from '../../player/recent-tracks/recent-tracks';
+import { SongRequest } from '../../request/song-request/song-request';
 import { PageMetadata } from '../../seo/page-metadata';
 import { ShareStation } from '../../share/share-station/share-station';
 import { STATION, WHATSAPP_URL } from '../../station/station';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, ShareStation],
+  imports: [RouterLink, ShareStation, LivePlayerAnchor, RecentTracks, SongRequest, WhatsappIcon],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -23,6 +27,9 @@ export class Home {
   protected readonly isPlaying = this.player.isPlaying;
   protected readonly isBusy = this.player.isBusy;
   protected readonly hasFailed = this.player.hasFailed;
+
+  /** Hasta que no termina la primera canción no hay lista que dibujar. */
+  protected readonly hasRecentTracks = computed(() => this.player.recentTracks().length > 0);
 
   constructor() {
     inject(PageMetadata).setPage({

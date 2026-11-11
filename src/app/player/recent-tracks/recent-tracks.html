@@ -1,0 +1,27 @@
+@if (tracks().length) {
+  <section class="recent" aria-labelledby="recent-heading">
+    <h2 id="recent-heading" class="recent__heading">Sonó hace poco</h2>
+
+    <ol class="recent__list">
+      @for (song of tracks(); track song.startedAt + song.title) {
+        <li class="recent__item">
+          <time class="recent__time" [attr.datetime]="song.isoTime">{{ song.time }}</time>
+          <p class="recent__track">
+            <b class="recent__artist">{{ song.artist }}</b
+            ><span class="recent__sep" aria-hidden="true"> · </span
+            ><span class="recent__title">{{ song.title }}</span>
+          </p>
+          <a
+            class="recent__request"
+            [href]="song.requestUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            [attr.aria-label]="'Pedir otra vez ' + song.title + ', de ' + song.artist"
+          >
+            Pedir
+          </a>
+        </li>
+      }
+    </ol>
+  </section>
+}

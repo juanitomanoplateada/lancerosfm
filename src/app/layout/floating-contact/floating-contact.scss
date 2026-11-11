@@ -3,12 +3,16 @@
 .contact {
   position: fixed;
   right: var(--sp-4);
-  bottom: calc(var(--player-bar-h) + var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bottom-chrome-h) + var(--sp-4) + env(safe-area-inset-bottom, 0px));
   z-index: var(--z-float);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: var(--sp-3);
+
+  /* El mismo margen a la izquierda que a la derecha: en una pantalla estrecha,
+     una opción larga parte en dos renglones en vez de salirse o recortarse. */
+  max-width: calc(100% - 2 * var(--sp-4));
 }
 
 .contact__toggle {
@@ -68,7 +72,15 @@
   font-weight: 600;
   text-decoration: none;
   box-shadow: var(--shadow-md);
-  white-space: nowrap;
+}
+
+.contact__item svg {
+  flex-shrink: 0;
+}
+
+.contact__whatsapp-icon {
+  width: 22px;
+  height: 22px;
 }
 
 .contact__item:hover {
@@ -78,20 +90,20 @@
 
 .contact__item--whatsapp {
   border-color: transparent;
-  background: #25d366;
-  color: #04310f;
+  background: var(--color-whatsapp);
+  color: var(--color-whatsapp-ink);
 }
 
 .contact__item--whatsapp:hover {
-  background: #1fbe5b;
-  color: #04310f;
+  background: var(--color-whatsapp-hover);
+  color: var(--color-whatsapp-ink);
 }
 
-@media (max-width: 40rem) {
-  .contact__item span {
-    /* El texto largo empujaría la burbuja fuera de la pantalla. */
-    max-width: 11rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* En el celular no hay sitio donde la burbuja no tape lo que se está leyendo.
+   Lo que ofrece queda igual de cerca: pedir una canción va en la barra del
+   reproductor, y el resto está en la pestaña de contacto. */
+@media (max-width: 48rem) {
+  .contact {
+    display: none;
   }
 }

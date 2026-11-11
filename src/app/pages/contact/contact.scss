@@ -4,8 +4,8 @@
   gap: var(--sp-4);
   padding: var(--sp-5);
   border-radius: var(--radius-md);
-  background: #0e7a41;
-  color: #fff;
+  background: var(--color-whatsapp-strong);
+  color: var(--color-white);
   text-decoration: none;
   box-shadow: var(--shadow-md);
   transition:
@@ -14,9 +14,16 @@
 }
 
 .highlight:hover {
-  background: #0c6a38;
-  color: #fff;
+  background: var(--color-whatsapp-strong-hover);
+  color: var(--color-white);
   transform: translateY(-2px);
+}
+
+/* El icono no cede cuando falta ancho —eso lo hace el texto—: de otro modo se
+   encogía hasta quedar más pequeño que la letra. */
+.highlight__icon {
+  width: 2rem;
+  height: 2rem;
 }
 
 .highlight__text {
@@ -30,7 +37,12 @@
   font-size: var(--text-xl);
 }
 
-.highlight__text span {
+/* Un teléfono partido en dos renglones se lee mal y se marca peor. */
+.highlight__number {
+  white-space: nowrap;
+}
+
+.highlight__hint {
   font-size: var(--text-sm);
   opacity: 0.9;
 }

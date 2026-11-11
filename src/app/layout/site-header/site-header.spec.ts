@@ -40,4 +40,13 @@ describe('SiteHeader', () => {
     await fixture.whenStable();
     expect(host().querySelector('.navbar__on-air')).toBeNull();
   });
+
+  it('cuelga el distintivo del logotipo, para que al encenderse no mueva la página', async () => {
+    isPlaying.set(true);
+    await fixture.whenStable();
+
+    const badge = host().querySelector('.navbar__on-air');
+    expect(badge?.parentElement).toBe(host().querySelector('.navbar__brand'));
+    expect(badge?.parentElement?.querySelector('.navbar__logo')).not.toBeNull();
+  });
 });

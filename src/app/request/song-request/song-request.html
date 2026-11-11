@@ -1,0 +1,55 @@
+<div class="request">
+  <div class="request__field">
+    <label for="request-song">¿Qué canción quieres oír?</label>
+    <input
+      id="request-song"
+      type="text"
+      autocomplete="off"
+      enterkeyhint="next"
+      placeholder="Ej.: Los caminos de la vida"
+      [value]="song()"
+      (input)="write(song, $event)"
+    />
+  </div>
+
+  <div class="request__field">
+    <label for="request-greeting">
+      ¿Para quién es el saludo? <span class="request__optional">(si quieres)</span>
+    </label>
+    <input
+      id="request-greeting"
+      type="text"
+      autocomplete="off"
+      enterkeyhint="next"
+      placeholder="Ej.: mi mamá, que cumple años"
+      [value]="greetingFor()"
+      (input)="write(greetingFor, $event)"
+    />
+  </div>
+
+  <div class="request__field">
+    <label for="request-from">
+      ¿De parte de quién? <span class="request__optional">(si quieres)</span>
+    </label>
+    <input
+      id="request-from"
+      type="text"
+      autocomplete="name"
+      enterkeyhint="done"
+      placeholder="Tu nombre"
+      [value]="from()"
+      (input)="write(from, $event)"
+    />
+  </div>
+
+  <a
+    class="btn btn--whatsapp request__send"
+    [href]="whatsappUrl()"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Enviar por WhatsApp
+  </a>
+
+  <p class="request__hint">Se abre WhatsApp con el mensaje ya escrito: solo falta enviarlo.</p>
+</div>

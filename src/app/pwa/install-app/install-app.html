@@ -1,0 +1,50 @@
+@if (isInstalled()) {
+  <p class="install__done">Ya tienes la emisora instalada en este dispositivo.</p>
+} @else if (canPrompt()) {
+  <button type="button" class="btn" (click)="install()">Instalar la aplicación</button>
+  <p class="install__hint">Es gratis, no pasa por ninguna tienda y casi no ocupa espacio.</p>
+} @else if (isAppleMobile()) {
+  <ol class="install__steps">
+    <li>
+      Toca
+      <svg
+        class="install__icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 15V3m0 0L8 7m4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"
+        />
+      </svg>
+      <b>Compartir</b>, en la barra del navegador.
+    </li>
+    <li>
+      Baja por la lista y elige
+      <svg
+        class="install__icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="4" y="4" width="16" height="16" rx="3" />
+        <path d="M12 8v8M8 12h8" />
+      </svg>
+      <b>«Agregar a inicio»</b>.
+    </li>
+    <li>Toca <b>«Agregar»</b>, arriba a la derecha.</li>
+  </ol>
+} @else {
+  <p>
+    Abre el menú del navegador y elige <b>«Agregar a la pantalla de inicio»</b> o
+    <b>«Instalar aplicación»</b>.
+  </p>
+}

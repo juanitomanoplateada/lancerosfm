@@ -33,12 +33,16 @@ export class PageMetadata {
   private readonly meta = inject(Meta);
   private readonly document = inject(DOCUMENT);
 
+  private pageTitle = '';
+  private nowPlaying = '';
+
   setPage({ title, description, path, image = DEFAULT_IMAGE, noindex = false }: PageInfo): void {
     const fullTitle = path === '/' ? title : `${title} | ${STATION.fullName}`;
     const url = `${STATION.origin}${path}`;
     const imageUrl = `${STATION.origin}${image}`;
 
-    this.title.setTitle(fullTitle);
+    this.pageTitle = fullTitle;
+    this.applyTitle();
     this.meta.updateTag({ name: 'description', content: description });
     this.meta.updateTag({
       name: 'robots',
@@ -68,6 +72,23 @@ export class PageMetadata {
   }
 
   /**
+   * Pone lo que suena en el título de la pestaña, por delante del nombre de la
+   * emisora; con una cadena vacía vuelve el título de la página.
+   *
+   * Solo cambia la pestaña. Las etiquetas sociales y lo que queda escrito en el
+   * prerender siguen con el título de cada página, que es lo que debe indexar un
+   * buscador.
+   */
+  setNowPlaying(text: string): void {
+    // Sin este filtro, el primer aviso —todavía sin página ni canción— dejaría
+    // la pestaña con el título en blanco.
+    if (text === this.nowPlaying) return;
+
+    this.nowPlaying = text;
+    this.applyTitle();
+  }
+
+  /**
    * Inserta o reemplaza un bloque JSON-LD. El `id` evita duplicados al navegar:
    * cada bloque se sobrescribe en lugar de acumularse.
    */
@@ -81,6 +102,12 @@ export class PageMetadata {
     script.textContent = JSON.stringify(data);
 
     if (!existing) this.document.head.appendChild(script);
+  }
+
+  private applyTitle(): void {
+    this.title.setTitle(
+      this.nowPlaying ? `▶ ${this.nowPlaying} · ${STATION.fullName}` : this.pageTitle,
+    );
   }
 
   private setCanonical(url: string): void {

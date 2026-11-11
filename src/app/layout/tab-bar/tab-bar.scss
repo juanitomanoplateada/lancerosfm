@@ -1,0 +1,102 @@
+/* Solo existe en el celular. Va un escalón por encima de la barra del
+   reproductor, que se apoya en ella y se esconde por detrás cuando se aparta. */
+:host {
+  display: none;
+}
+
+@media (max-width: 48rem) {
+  :host {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: calc(var(--z-player) + 1);
+    display: block;
+  }
+}
+
+.tabs {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  background: var(--color-bar);
+  box-shadow: 0 -6px 20px rgb(0 0 0 / 25%);
+}
+
+.tabs__list {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  height: var(--tab-bar-h);
+}
+
+.tabs__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 100%;
+  color: var(--color-on-dark-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+
+.tabs__link:hover {
+  color: var(--color-white);
+}
+
+/* La pastilla detrás del icono es la que dice dónde está el oyente: el mismo
+   verde que marca la sección activa en la cabecera de las pantallas anchas. */
+.tabs__icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 1.75rem;
+  border-radius: var(--radius-pill);
+  transition: background var(--transition);
+}
+
+.tabs__link.is-active {
+  color: var(--color-white);
+}
+
+.tabs__link.is-active .tabs__icon {
+  background: var(--color-secondary-text);
+}
+
+.tabs :focus-visible {
+  outline-color: var(--color-accent);
+  outline-offset: -3px;
+}
+
+/* En los celulares más estrechos «Cómo escuchar» no cabe a este tamaño. */
+@media (max-width: 22.5rem) {
+  .tabs__link {
+    font-size: 0.6875rem;
+  }
+}
+
+/* Celular acostado: las pestañas ocupan la mitad derecha de la franja de abajo
+   y el reproductor la izquierda. Con ese ancho no caben los rótulos, que siguen
+   ahí para los lectores de pantalla. */
+@media (max-width: 48rem) and (max-height: 30rem) {
+  :host {
+    left: 50%;
+  }
+
+  .tabs {
+    border-left: 1px solid rgb(255 255 255 / 8%);
+  }
+
+  .tabs__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}

@@ -1,49 +1,67 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Component, computed, ElementRef, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 
+import { WhatsappIcon } from '../../icons/whatsapp-icon';
+import { WHATSAPP_URL } from '../../station/station';
+import { LivePlayerPresence } from '../live-player-presence';
 import { RadioPlayer } from '../radio-player';
 
-/**
- * Igual que en la hoja de estilos: por debajo de este ancho, el deslizador de
- * volumen se despliega en vez de estar siempre a la vista.
- */
-const COMPACT_WIDTH = '(max-width: 48rem)';
+/** Donde la barra espaciadora ya tiene oficio: escribir o accionar lo que está enfocado. */
+const BUSY_WITH_SPACE_BAR = 'a[href], button, input, select, textarea, summary, [contenteditable]';
 
 /**
  * Barra fija de reproducción. Vive en la raíz de la aplicación, fuera del
  * `router-outlet`: por eso el oyente puede recorrer el sitio entero sin que la
  * emisora se corte ni un segundo.
+ *
+ * Lleva lo mismo en todas las pantallas —reproducir y qué suena— y cambia el
+ * tercer control según lo que sirve en cada una: el volumen en las anchas, y en
+ * el celular, donde el volumen ya lo dan los botones del teléfono, pedir una
+ * canción.
  */
 @Component({
   selector: 'app-player-bar',
+  imports: [WhatsappIcon],
   templateUrl: './player-bar.html',
   styleUrl: './player-bar.scss',
   host: {
-    '(document:click)': 'collapseVolumeOnOutsideClick($event)',
+    '(document:keydown.space)': 'toggleWithSpaceBar($event)',
+    '[class.is-redundant]': 'isRedundant()',
   },
 })
 export class PlayerBar {
   private readonly player = inject(RadioPlayer);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  protected readonly state = this.player.state;
+  protected readonly whatsappUrl = WHATSAPP_URL;
+
   protected readonly track = this.player.track;
   protected readonly volume = this.player.volume;
+  protected readonly canSetVolume = this.player.canSetVolume;
   protected readonly isPlaying = this.player.isPlaying;
   protected readonly isBusy = this.player.isBusy;
   protected readonly hasFailed = this.player.hasFailed;
   protected readonly isMuted = this.player.isMuted;
 
+  /**
+   * Con el reproductor grande de la portada a la vista, la barra repite lo
+   * mismo. Aquí solo se marca; es la hoja de estilos la que decide apartarla, y
+   * lo hace nada más en el celular, donde además lo tapa.
+   */
+  protected readonly isRedundant = inject(LivePlayerPresence).onScreen;
+
   protected readonly volumePercent = computed(() => Math.round(this.volume() * 100));
 
-  /** Mientras no llega ningún metadato, la barra invita a sintonizar. */
-  protected readonly displayTitle = computed(
-    () => this.track().title || 'Presiona ▶ para sintonizar la 94.1 FM',
-  );
-
-  /** La marquesina solo tiene sentido cuando hay un título de verdad. */
-  protected readonly shouldScroll = computed(() => this.track().title.length > 0);
+  /**
+   * El stream no siempre manda título —pasa con las cuñas y los avisos—. Sin
+   * él, la barra dice en qué está la emisora: invitar a sintonizar solo tiene
+   * sentido mientras no suena.
+   */
+  protected readonly displayTitle = computed(() => {
+    const { title } = this.track();
+    if (title) return title;
+    if (this.isBusy()) return 'Conectando…';
+    if (this.isPlaying()) return 'En vivo · 94.1 FM';
+    return 'Presiona ▶ para sintonizar la 94.1 FM';
+  });
 
   protected readonly announcement = computed(() => {
     if (this.hasFailed()) return 'No se pudo conectar con la emisora.';
@@ -51,25 +69,6 @@ export class PlayerBar {
     if (!title) return '';
     return artist ? `Sonando ahora: ${artist}, ${title}` : `Sonando ahora: ${title}`;
   });
-
-  private readonly isCompact = signal(false);
-  protected readonly volumeExpanded = signal(false);
-
-  protected readonly volumeButtonLabel = computed(() => {
-    if (this.isCompact() && !this.volumeExpanded()) return 'Ajustar el volumen';
-    return this.isMuted() ? 'Activar el sonido' : 'Silenciar';
-  });
-
-  constructor() {
-    if (!this.isBrowser) return;
-
-    const query = globalThis.matchMedia(COMPACT_WIDTH);
-    this.isCompact.set(query.matches);
-    query.addEventListener('change', (event) => {
-      this.isCompact.set(event.matches);
-      if (!event.matches) this.volumeExpanded.set(false);
-    });
-  }
 
   protected toggle(): void {
     this.player.toggle();
@@ -79,25 +78,26 @@ export class PlayerBar {
     this.player.retry();
   }
 
+  protected toggleMute(): void {
+    this.player.toggleMute();
+  }
+
   protected changeVolume(event: Event): void {
     this.player.setVolume(Number((event.target as HTMLInputElement).value));
   }
 
   /**
-   * En pantallas anchas el botón silencia directamente. En las estrechas, donde
-   * el deslizador está plegado, el primer toque lo despliega y el segundo ya
-   * silencia: así el control cabe sin robarle espacio al título de la canción.
+   * La barra espaciadora pausa y reanuda desde cualquier parte de la página,
+   * como en cualquier reproductor. Se respeta cuando ya tiene otro oficio: al
+   * escribir en un campo o al accionar el botón o el enlace que tiene el foco.
    */
-  protected onVolumeButton(): void {
-    if (this.isCompact() && !this.volumeExpanded()) {
-      this.volumeExpanded.set(true);
-      return;
-    }
-    this.player.toggleMute();
-  }
+  protected toggleWithSpaceBar(event: Event): void {
+    const { repeat, target } = event as KeyboardEvent;
+    if (repeat) return;
+    if (target instanceof Element && target.closest(BUSY_WITH_SPACE_BAR)) return;
 
-  protected collapseVolumeOnOutsideClick(event: MouseEvent): void {
-    if (!this.volumeExpanded()) return;
-    if (!this.host.nativeElement.contains(event.target as Node)) this.volumeExpanded.set(false);
+    // Sin esto, además de pausar, la página bajaría una pantalla.
+    event.preventDefault();
+    this.player.toggle();
   }
 }

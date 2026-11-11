@@ -49,6 +49,19 @@ describe('HowToListen', () => {
     ).toEqual(visible);
   });
 
+  it('nombra el botón del reproductor por lo que dice, no por su color', () => {
+    expect(host.textContent).toContain('toca el botón «Escuchar en vivo»');
+  });
+
+  it('explica cómo dejar la emisora instalada en el dispositivo', () => {
+    const install = host.querySelector('app-install-app');
+
+    expect(install?.closest('.way')?.querySelector('h2')?.textContent).toBe(
+      'Como aplicación instalada',
+    );
+    expect(install?.textContent).toContain('«Agregar a la pantalla de inicio»');
+  });
+
   it('responde con los datos reales de la emisora', () => {
     expect(host.textContent).toContain('Escríbenos por WhatsApp al 310 268 8737');
     expect(host.textContent).toContain('En el 94.1 de la FM, en Tuta');

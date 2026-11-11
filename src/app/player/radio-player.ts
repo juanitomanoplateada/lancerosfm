@@ -1,12 +1,29 @@
 import { isPlatformBrowser } from '@angular/common';
-import { computed, inject, Injectable, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
+import {
+  computed,
+  DOCUMENT,
+  inject,
+  Injectable,
+  OnDestroy,
+  PLATFORM_ID,
+  signal,
+} from '@angular/core';
 
 import { STATION } from '../station/station';
 import { ToastQueue } from '../toasts/toast-queue';
-import { parseTrack, PlayerState, StreamMetadata, Track } from './track';
+import { parseTrack, PlayedTrack, PlayerState, StreamMetadata, Track } from './track';
 
 const VOLUME_KEY = 'lanceros:volume';
 const DEFAULT_VOLUME = 1;
+
+/** Cuántas canciones recientes se recuerdan. */
+const MAX_RECENT_TRACKS = 5;
+
+/**
+ * Lo mínimo con lo que vuelve a abrir la emisora. Quien la dejó casi apagada
+ * con el deslizador espera oírla la próxima vez que le dé a reproducir.
+ */
+const MIN_RESTORED_VOLUME = 0.2;
 
 /** Espera entre reintentos, en milisegundos. El último valor se repite. */
 const RETRY_DELAYS = [1_000, 2_000, 4_000, 8_000, 15_000] as const;
@@ -28,15 +45,27 @@ const MAX_RETRIES = 5;
 @Injectable({ providedIn: 'root' })
 export class RadioPlayer implements OnDestroy {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly document = inject(DOCUMENT);
   private readonly toasts = inject(ToastQueue);
 
   private readonly playerState = signal<PlayerState>('stopped');
   private readonly currentTrack = signal<Track>({ artist: '', title: '' });
   private readonly currentVolume = signal(DEFAULT_VOLUME);
+  private readonly history = signal<readonly PlayedTrack[]>([]);
+  private readonly volumeIsAdjustable = signal(true);
 
   readonly state = this.playerState.asReadonly();
   readonly track = this.currentTrack.asReadonly();
   readonly volume = this.currentVolume.asReadonly();
+
+  /** Las últimas canciones que sonaron, de la más reciente a la más antigua. */
+  readonly recentTracks = this.history.asReadonly();
+
+  /**
+   * `false` donde el navegador no deja tocar el volumen —iPhone y iPad, que lo
+   * reservan a los botones del aparato—: ahí un deslizador no haría nada.
+   */
+  readonly canSetVolume = this.volumeIsAdjustable.asReadonly();
 
   readonly isPlaying = computed(() => this.playerState() === 'playing');
   readonly isBusy = computed(
@@ -52,6 +81,7 @@ export class RadioPlayer implements OnDestroy {
   private retryAttempt = 0;
   private metadataAttempt = 0;
   private volumeBeforeMute = DEFAULT_VOLUME;
+  private trackStartedAt = 0;
 
   /** Distingue una pausa deliberada de una caída: solo se reintenta la caída. */
   private wantsToPlay = false;
@@ -59,6 +89,7 @@ export class RadioPlayer implements OnDestroy {
   constructor() {
     if (!this.isBrowser) return;
 
+    this.volumeIsAdjustable.set(this.detectVolumeControl());
     this.restoreVolume();
     this.connectMetadata();
 
@@ -101,9 +132,14 @@ export class RadioPlayer implements OnDestroy {
   setVolume(value: number): void {
     const volume = Math.min(1, Math.max(0, value));
     this.currentVolume.set(volume);
-    if (volume > 0) this.volumeBeforeMute = volume;
-    if (this.audio) this.audio.volume = volume;
-    this.persistVolume(volume);
+    if (this.audio) this.applyVolume(this.audio);
+
+    // El silencio dura lo que dura la visita y no se guarda: si se recordara,
+    // la emisora volvería muda otro día sin nada en pantalla que lo explique.
+    if (volume > 0) {
+      this.volumeBeforeMute = volume;
+      this.persistVolume(volume);
+    }
   }
 
   toggleMute(): void {
@@ -133,7 +169,7 @@ export class RadioPlayer implements OnDestroy {
     if (!this.audio) {
       const audio = new Audio();
       audio.preload = 'none';
-      audio.volume = this.currentVolume();
+      this.applyVolume(audio);
       audio.addEventListener('playing', this.handlePlaying);
       audio.addEventListener('waiting', this.handleWaiting);
       audio.addEventListener('stalled', this.handleStalled);
@@ -154,6 +190,22 @@ export class RadioPlayer implements OnDestroy {
     this.audio.pause();
     this.audio.removeAttribute('src');
     this.audio.load();
+  }
+
+  /**
+   * El silencio va también por `muted`: es lo único que respetan los iPhone y
+   * los iPad, donde asignar el volumen no hace nada.
+   */
+  private applyVolume(audio: HTMLAudioElement): void {
+    audio.volume = this.currentVolume();
+    audio.muted = this.currentVolume() === 0;
+  }
+
+  /** Asigna un volumen de prueba a un elemento suelto y mira si el navegador lo acepta. */
+  private detectVolumeControl(): boolean {
+    const probe = this.document.createElement('audio');
+    probe.volume = 0.5;
+    return probe.volume === 0.5;
   }
 
   private readonly handlePlaying = (): void => {
@@ -229,13 +281,31 @@ export class RadioPlayer implements OnDestroy {
     try {
       const data = JSON.parse(event.data) as StreamMetadata;
       if (data.streamTitle) {
-        this.currentTrack.set(parseTrack(data.streamTitle));
+        this.changeTrack(parseTrack(data.streamTitle));
         this.publishTrack();
       }
     } catch {
       // Zeno intercala mensajes de control que no son JSON. Se ignoran.
     }
   };
+
+  private changeTrack(next: Track): void {
+    const previous = this.currentTrack();
+
+    // El canal repite el título cada cierto tiempo y cada vez que reconecta: eso
+    // no es una canción nueva y no debe duplicar la anterior en la lista.
+    if (next.artist === previous.artist && next.title === previous.title) return;
+
+    // A la lista solo pasan las canciones, que son lo que trae artista; las
+    // cuñas y los avisos no se pueden pedir de nuevo.
+    if (previous.artist && previous.title) {
+      const played: PlayedTrack = { ...previous, startedAt: this.trackStartedAt };
+      this.history.update((tracks) => [played, ...tracks].slice(0, MAX_RECENT_TRACKS));
+    }
+
+    this.trackStartedAt = Date.now();
+    this.currentTrack.set(next);
+  }
 
   private readonly handleMetadataError = (): void => {
     // EventSource reconecta solo mientras no esté cerrado; si el servidor cortó
@@ -284,8 +354,10 @@ export class RadioPlayer implements OnDestroy {
   private restoreVolume(): void {
     const stored = this.readStoredVolume();
     if (stored === null) return;
-    this.currentVolume.set(stored);
-    if (stored > 0) this.volumeBeforeMute = stored;
+
+    const volume = Math.max(stored, MIN_RESTORED_VOLUME);
+    this.currentVolume.set(volume);
+    this.volumeBeforeMute = volume;
   }
 
   private readStoredVolume(): number | null {
@@ -293,7 +365,10 @@ export class RadioPlayer implements OnDestroy {
       const raw = localStorage.getItem(VOLUME_KEY);
       if (raw === null) return null;
       const value = Number(raw);
-      return Number.isFinite(value) && value >= 0 && value <= 1 ? value : null;
+
+      // El cero no vale: solo pudo dejarlo una versión anterior, que sí
+      // guardaba el silencio.
+      return Number.isFinite(value) && value > 0 && value <= 1 ? value : null;
     } catch {
       // Modo privado o almacenamiento bloqueado: se usa el volumen por defecto.
       return null;

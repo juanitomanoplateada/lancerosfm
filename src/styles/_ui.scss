@@ -89,14 +89,14 @@
 }
 
 .btn--whatsapp {
-  border-color: #0e7a41;
-  background: #0e7a41;
+  border-color: var(--color-whatsapp-strong);
+  background: var(--color-whatsapp-strong);
   color: var(--color-white);
 }
 
 .btn--whatsapp:hover {
-  border-color: #0c6a38;
-  background: #0c6a38;
+  border-color: var(--color-whatsapp-strong-hover);
+  background: var(--color-whatsapp-strong-hover);
   color: var(--color-white);
 }
 
@@ -144,6 +144,12 @@
 
 .prose > * + * {
   margin-top: var(--sp-4);
+}
+
+/* El aire de arriba ya lo pone la sección: un título que abre el bloque no
+   debe sumarle el suyo. */
+.prose > :first-child {
+  margin-top: 0;
 }
 
 .prose h2 {

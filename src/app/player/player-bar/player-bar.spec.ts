@@ -1,7 +1,9 @@
-import { computed, PLATFORM_ID, signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { WHATSAPP_URL } from '../../station/station';
+import { LivePlayerPresence } from '../live-player-presence';
 import { RadioPlayer } from '../radio-player';
 import { PlayerState, Track } from '../track';
 import { PlayerBar } from './player-bar';
@@ -11,6 +13,7 @@ class FakeRadioPlayer {
   readonly state = signal<PlayerState>('stopped');
   readonly track = signal<Track>({ artist: '', title: '' });
   readonly volume = signal(1);
+  readonly canSetVolume = signal(true);
 
   readonly isPlaying = computed(() => this.state() === 'playing');
   readonly isBusy = computed(() => this.state() === 'loading' || this.state() === 'reconnecting');
@@ -23,42 +26,17 @@ class FakeRadioPlayer {
   readonly toggleMute = vi.fn(() => this.volume.set(this.volume() > 0 ? 0 : 1));
 }
 
-/** Doble de `matchMedia`: permite cambiar el ancho de la pantalla en mitad de la prueba. */
-class FakeMediaQuery {
-  private readonly listeners = new Set<(event: { matches: boolean }) => void>();
-
-  constructor(public matches: boolean) {}
-
-  addEventListener(_type: 'change', listener: (event: { matches: boolean }) => void): void {
-    this.listeners.add(listener);
-  }
-
-  resize(matches: boolean): void {
-    this.matches = matches;
-    for (const listener of this.listeners) listener({ matches });
-  }
-}
-
 describe('PlayerBar', () => {
   let player: FakeRadioPlayer;
-  let media: FakeMediaQuery;
   let fixture: ComponentFixture<PlayerBar>;
 
   function host(): HTMLElement {
     return fixture.nativeElement as HTMLElement;
   }
 
-  function render(options: { compact?: boolean; platform?: string } = {}): void {
-    media = new FakeMediaQuery(options.compact ?? false);
-    vi.stubGlobal(
-      'matchMedia',
-      vi.fn(() => media),
-    );
+  function render(): void {
     TestBed.configureTestingModule({
-      providers: [
-        { provide: RadioPlayer, useValue: player },
-        { provide: PLATFORM_ID, useValue: options.platform ?? 'browser' },
-      ],
+      providers: [{ provide: RadioPlayer, useValue: player }],
     });
     fixture = TestBed.createComponent(PlayerBar);
     fixture.autoDetectChanges();
@@ -76,24 +54,34 @@ describe('PlayerBar', () => {
     return host().querySelector<HTMLButtonElement>('.volume-btn')!;
   }
 
-  function volumeControl(): HTMLElement {
-    return host().querySelector<HTMLElement>('.volume-control')!;
-  }
-
-  function slider(): HTMLInputElement {
-    return host().querySelector<HTMLInputElement>('input[type="range"]')!;
+  function slider(): HTMLInputElement | null {
+    return host().querySelector<HTMLInputElement>('input[type="range"]');
   }
 
   function announcement(): string {
     return host().querySelector('[aria-live="polite"]')!.textContent!.trim();
   }
 
+  /** Lo que la barra muestra donde va el nombre de la canción. */
+  function title(): string {
+    return host().querySelector('.track__title')!.textContent!.trim();
+  }
+
+  /** Pulsa la barra espaciadora con el foco en el elemento dado. */
+  function pressSpace(target: EventTarget, init: KeyboardEventInit = {}): KeyboardEvent {
+    const event = new KeyboardEvent('keydown', {
+      key: ' ',
+      code: 'Space',
+      bubbles: true,
+      cancelable: true,
+      ...init,
+    });
+    target.dispatchEvent(event);
+    return event;
+  }
+
   beforeEach(() => {
     player = new FakeRadioPlayer();
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
   });
 
   describe('reproducción', () => {
@@ -108,9 +96,7 @@ describe('PlayerBar', () => {
       render();
 
       expect(playButton().getAttribute('aria-label')).toBe('Sintonizar la emisora en vivo');
-      expect(host().querySelector('.metadata-desktop')?.textContent).toContain(
-        'Presiona ▶ para sintonizar la 94.1 FM',
-      );
+      expect(title()).toBe('Presiona ▶ para sintonizar la 94.1 FM');
       expect(announcement()).toBe('');
     });
 
@@ -142,7 +128,60 @@ describe('PlayerBar', () => {
     });
   });
 
+  describe('sin título de canción', () => {
+    it('avisa de que está conectando', async () => {
+      render();
+
+      player.state.set('loading');
+      await settle();
+
+      expect(title()).toBe('Conectando…');
+    });
+
+    it('dice que está en vivo en vez de seguir invitando a sintonizar', async () => {
+      render();
+
+      player.state.set('playing');
+      await settle();
+
+      expect(title()).toBe('En vivo · 94.1 FM');
+    });
+
+    it('cede el sitio a la canción en cuanto llega el título', async () => {
+      render();
+      player.state.set('playing');
+
+      player.track.set({ artist: '', title: 'Cuña institucional' });
+      await settle();
+
+      expect(title()).toBe('Cuña institucional');
+    });
+  });
+
   describe('canción al aire', () => {
+    it('la muestra en dos renglones: el artista arriba y la canción debajo', async () => {
+      render();
+
+      player.track.set({ artist: 'Jorge Celedón', title: 'Ay hombe' });
+      await settle();
+
+      const lines = [...host().querySelectorAll('.track > span')].map((line) =>
+        line.textContent?.trim(),
+      );
+      expect(lines).toEqual(['Jorge Celedón', 'Ay hombe']);
+      expect(host().querySelector('.track__title--alone')).toBeNull();
+    });
+
+    it('deja que el título ocupe los dos renglones cuando no hay artista', async () => {
+      render();
+
+      player.track.set({ artist: '', title: 'Cuña institucional' });
+      await settle();
+
+      expect(host().querySelector('.track__artist')).toBeNull();
+      expect(host().querySelector('.track__title')?.classList).toContain('track__title--alone');
+    });
+
     it('anuncia artista y título una sola vez', async () => {
       render();
 
@@ -150,7 +189,7 @@ describe('PlayerBar', () => {
       await settle();
 
       expect(announcement()).toBe('Sonando ahora: Jorge Celedón, Ay hombe');
-      expect(host().querySelector('.metadata-desktop')?.getAttribute('aria-hidden')).toBe('true');
+      expect(host().querySelector('.track')?.getAttribute('aria-hidden')).toBe('true');
     });
 
     it('anuncia solo el título cuando no hay artista', async () => {
@@ -160,19 +199,6 @@ describe('PlayerBar', () => {
       await settle();
 
       expect(announcement()).toBe('Sonando ahora: Cuña institucional');
-      expect(host().querySelector('.metadata-desktop .artist')).toBeNull();
-    });
-
-    it('activa la marquesina en el celular solo cuando hay un título de verdad', async () => {
-      render();
-      const track = () => host().querySelector('.metadata-mobile__track')!;
-      expect(track().classList).toContain('is-static');
-
-      player.track.set({ artist: 'Binomio de Oro', title: 'Momentos' });
-      await settle();
-
-      expect(track().classList).not.toContain('is-static');
-      expect(track().querySelectorAll('.metadata__text')).toHaveLength(2);
     });
   });
 
@@ -184,13 +210,29 @@ describe('PlayerBar', () => {
       await settle();
 
       expect(announcement()).toBe('No se pudo conectar con la emisora.');
+      expect(host().querySelector('.player-error')?.textContent).toContain(
+        'Sin conexión con la emisora',
+      );
+      expect(host().querySelector('.track')).toBeNull();
+
       host().querySelector<HTMLButtonElement>('.player-error__retry')!.click();
       expect(player.retry).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('volumen en pantallas anchas', () => {
-    it('silencia directamente con el botón', async () => {
+  describe('pedir una canción', () => {
+    it('lleva al WhatsApp de la emisora con la petición ya empezada', () => {
+      render();
+
+      const request = host().querySelector<HTMLAnchorElement>('.request-btn')!;
+      expect(request.href).toBe(WHATSAPP_URL);
+      expect(request.getAttribute('aria-label')).toBe('Pedir una canción por WhatsApp');
+      expect(request.target).toBe('_blank');
+    });
+  });
+
+  describe('volumen', () => {
+    it('silencia con el botón y lo dice en su nombre', async () => {
       render();
       expect(volumeButton().getAttribute('aria-label')).toBe('Silenciar');
 
@@ -201,81 +243,112 @@ describe('PlayerBar', () => {
       expect(volumeButton().getAttribute('aria-label')).toBe('Activar el sonido');
     });
 
+    it('cambia el dibujo del altavoz cuando el volumen va bajo', async () => {
+      render();
+      const waves = () => volumeButton().querySelectorAll('path').length;
+      const full = waves();
+
+      player.volume.set(0.3);
+      await settle();
+
+      expect(waves()).toBeLessThan(full);
+    });
+
     it('lleva el deslizador al reproductor y anuncia el porcentaje', async () => {
       render();
 
-      slider().value = '0.35';
-      slider().dispatchEvent(new Event('input'));
+      slider()!.value = '0.35';
+      slider()!.dispatchEvent(new Event('input'));
       await settle();
 
       expect(player.setVolume).toHaveBeenCalledWith(0.35);
-      expect(slider().getAttribute('aria-valuetext')).toBe('35 por ciento');
+      expect(slider()!.getAttribute('aria-valuetext')).toBe('35 por ciento');
+    });
+
+    it('pinta la pista del deslizador hasta donde va el volumen', async () => {
+      render();
+
+      player.volume.set(0.6);
+      await settle();
+
+      expect(slider()!.style.getPropertyValue('--volume-fill')).toBe('60%');
+    });
+
+    it('quita el deslizador donde el navegador no deja tocar el volumen', async () => {
+      render();
+
+      player.canSetVolume.set(false);
+      await settle();
+
+      // El silencio sí funciona en todas partes, así que el botón se queda.
+      expect(slider()).toBeNull();
+      expect(volumeButton()).not.toBeNull();
     });
   });
 
-  describe('volumen en el celular', () => {
-    it('el primer toque despliega el deslizador y el segundo silencia', async () => {
-      render({ compact: true });
-      expect(volumeButton().getAttribute('aria-label')).toBe('Ajustar el volumen');
+  describe('barra espaciadora', () => {
+    it('pausa o reanuda desde cualquier parte de la página, sin que esta baje', () => {
+      render();
 
-      volumeButton().click();
-      await settle();
-      expect(volumeControl().classList).toContain('is-expanded');
-      expect(player.toggleMute).not.toHaveBeenCalled();
-      expect(volumeButton().getAttribute('aria-label')).toBe('Silenciar');
+      const event = pressSpace(document.body);
 
-      volumeButton().click();
-      expect(player.toggleMute).toHaveBeenCalledTimes(1);
+      expect(player.toggle).toHaveBeenCalledTimes(1);
+      expect(event.defaultPrevented).toBe(true);
     });
 
-    it('pliega el deslizador al tocar fuera de la barra', async () => {
-      render({ compact: true });
-      volumeButton().click();
-      await settle();
+    it('funciona también cuando nada tiene el foco', () => {
+      render();
 
-      // Un toque dentro de la barra no lo cierra.
-      slider().click();
-      await settle();
-      expect(volumeControl().classList).toContain('is-expanded');
+      pressSpace(document);
 
-      document.body.click();
-      await settle();
-      expect(volumeControl().classList).not.toContain('is-expanded');
+      expect(player.toggle).toHaveBeenCalledTimes(1);
     });
 
-    it('no hace nada con los toques fuera si el deslizador está plegado', async () => {
-      render({ compact: true });
+    it('no se mete cuando el foco está en un botón, un enlace o un campo', () => {
+      render();
+      const field = document.createElement('input');
+      document.body.append(field);
 
-      document.body.click();
-      await settle();
+      const onButton = pressSpace(volumeButton());
+      const onField = pressSpace(field);
 
-      expect(volumeControl().classList).not.toContain('is-expanded');
-      expect(volumeButton().getAttribute('aria-label')).toBe('Ajustar el volumen');
+      expect(player.toggle).not.toHaveBeenCalled();
+      expect(onButton.defaultPrevented).toBe(false);
+      expect(onField.defaultPrevented).toBe(false);
+
+      field.remove();
     });
 
-    it('se adapta si la pantalla cambia de tamaño', async () => {
-      render({ compact: true });
-      volumeButton().click();
-      await settle();
+    it('no dispara una ráfaga si la tecla se queda apretada', () => {
+      render();
 
-      // Al girar el celular a horizontal deja de ser compacta: nada queda desplegado.
-      media.resize(false);
-      await settle();
-      expect(volumeControl().classList).not.toContain('is-expanded');
-      expect(volumeButton().getAttribute('aria-label')).toBe('Silenciar');
+      pressSpace(document.body, { repeat: true });
 
-      media.resize(true);
-      await settle();
-      expect(volumeButton().getAttribute('aria-label')).toBe('Ajustar el volumen');
+      expect(player.toggle).not.toHaveBeenCalled();
+    });
+
+    it('deja pasar las combinaciones con otras teclas', () => {
+      render();
+
+      pressSpace(document.body, { shiftKey: true });
+
+      expect(player.toggle).not.toHaveBeenCalled();
     });
   });
 
-  describe('durante el prerender', () => {
-    it('no consulta el ancho de pantalla, que no existe en el servidor', () => {
-      render({ compact: true, platform: 'server' });
+  describe('con el reproductor grande de la portada a la vista', () => {
+    it('se marca como redundante, y deja de estarlo cuando el oyente baja', async () => {
+      render();
+      const livePlayer = TestBed.inject(LivePlayerPresence);
+      expect(host().classList).not.toContain('is-redundant');
 
-      expect(globalThis.matchMedia).not.toHaveBeenCalled();
-      expect(volumeButton().getAttribute('aria-label')).toBe('Silenciar');
+      livePlayer.set(true);
+      await settle();
+      expect(host().classList).toContain('is-redundant');
+
+      livePlayer.set(false);
+      await settle();
+      expect(host().classList).not.toContain('is-redundant');
     });
   });
 });

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { RadioPlayer } from '../../player/radio-player';
+import { NAVIGATION } from '../navigation';
 
 @Component({
   selector: 'app-site-header',
@@ -11,6 +12,8 @@ import { RadioPlayer } from '../../player/radio-player';
 })
 export class SiteHeader {
   private readonly player = inject(RadioPlayer);
+
+  protected readonly items = NAVIGATION;
 
   /** El distintivo «al aire» solo se enciende cuando de verdad está sonando. */
   protected readonly isPlaying = this.player.isPlaying;
