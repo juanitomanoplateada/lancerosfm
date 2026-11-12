@@ -43,8 +43,9 @@ export class PlayerBar {
 
   /**
    * Con el reproductor grande de la portada a la vista, la barra repite lo
-   * mismo. Aquí solo se marca; es la hoja de estilos la que decide apartarla, y
-   * lo hace nada más en el celular, donde además lo tapa.
+   * mismo. Aquí solo se marca; es la hoja de estilos la que decide apartarla,
+   * en todos los tamaños menos con el celular acostado, donde no hay altura para
+   * que se vaya.
    */
   protected readonly isRedundant = inject(LivePlayerPresence).onScreen;
 
@@ -52,15 +53,16 @@ export class PlayerBar {
 
   /**
    * El stream no siempre manda título —pasa con las cuñas y los avisos—. Sin
-   * él, la barra dice en qué está la emisora: invitar a sintonizar solo tiene
-   * sentido mientras no suena.
+   * él, la barra dice en qué está la emisora. Mientras no suena, nombra lo que
+   * hace el botón de al lado, igual que la etiqueta del botón grande de la
+   * portada: no le explica a nadie qué tocar, porque el triángulo ya lo dice.
    */
   protected readonly displayTitle = computed(() => {
     const { title } = this.track();
     if (title) return title;
     if (this.isBusy()) return 'Conectando…';
     if (this.isPlaying()) return 'En vivo · 94.1 FM';
-    return 'Presiona ▶ para sintonizar la 94.1 FM';
+    return 'Escuchar en vivo';
   });
 
   protected readonly announcement = computed(() => {

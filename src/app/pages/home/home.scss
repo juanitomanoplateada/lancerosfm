@@ -50,6 +50,11 @@
   gap: var(--hero-gap);
   padding: 0;
   border-radius: var(--radius-md);
+
+  /* En el celular, sin el recuadro gris con que el navegador marca el toque: en
+     un círculo queda feo, y la respuesta ya la da la pulsación de más abajo. */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* Si cambia este tamaño, hay que ajustar también el `sizes` del logo en la
@@ -104,10 +109,6 @@
   transition:
     transform var(--transition),
     box-shadow var(--transition);
-}
-
-.tune:hover .tune__image {
-  transform: scale(1.02);
 }
 
 .tune__visual.is-playing .tune__image {
@@ -174,16 +175,15 @@
   color: var(--color-white);
   transform: translate(-50%, 30%);
   box-shadow: var(--shadow-md);
-  transition: background var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition),
+    transform var(--transition);
 }
 
 .tune__badge svg {
   width: 1.6rem;
   height: 1.6rem;
-}
-
-.tune:hover .tune__badge {
-  background: var(--color-primary);
 }
 
 .tune__spinner {
@@ -205,16 +205,55 @@
   font-size: var(--text-lg);
   font-weight: 700;
   box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
-  transition: background var(--transition);
-}
-
-.tune:hover .tune__label {
-  background: var(--color-accent-light);
+  transition:
+    background var(--transition),
+    transform var(--transition);
 }
 
 .tune:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 6px;
+}
+
+/* --- Respuesta al puntero ------------------------------------------------- */
+
+/* Cómo sabe quien entra que ahí se toca, sin que haya que decírselo: el verbo
+   en la etiqueta («Escuchar en vivo»), el triángulo de reproducir sobre el logo,
+   el dorado —el único color cálido de la pantalla—, y que todo responda.
+
+   Con ratón, al pasar por encima se enciende el conjunto entero —el distintivo
+   y la etiqueta a la vez—, y así se entiende que el logo y el botón son una sola
+   cosa. Solo donde hay `hover`: en el celular se queda pegado después de tocar. */
+@media (hover: hover) {
+  .tune:hover .tune__image {
+    transform: scale(1.02);
+  }
+
+  .tune:hover .tune__badge {
+    background: var(--color-accent);
+    color: var(--color-primary);
+    transform: translate(-50%, 30%) scale(1.08);
+  }
+
+  .tune:hover .tune__label {
+    background: var(--color-accent-light);
+    transform: translateY(-1px);
+  }
+}
+
+/* Al pulsar —con el dedo o con el ratón— todo se hunde un poco: es la respuesta
+   inmediata de que el toque llegó, antes de que el audio empiece a conectar. En
+   el celular, donde no hay `hover`, es la única. */
+.tune:active .tune__image {
+  transform: scale(0.98);
+}
+
+.tune:active .tune__badge {
+  transform: translate(-50%, 30%) scale(0.94);
+}
+
+.tune:active .tune__label {
+  transform: scale(0.97);
 }
 
 /* --- Qué está sonando ----------------------------------------------------- */
@@ -328,12 +367,6 @@
   color: var(--color-on-dark);
 }
 
-.live-player__request:hover {
-  border-color: var(--color-white);
-  background: var(--color-white);
-  color: var(--color-primary);
-}
-
 .live-player__request-icon {
   width: 1.25rem;
   height: 1.25rem;
@@ -341,8 +374,16 @@
   transition: color var(--transition);
 }
 
-.live-player__request:hover .live-player__request-icon {
-  color: var(--color-whatsapp-strong);
+@media (hover: hover) {
+  .live-player__request:hover {
+    border-color: var(--color-white);
+    background: var(--color-white);
+    color: var(--color-primary);
+  }
+
+  .live-player__request:hover .live-player__request-icon {
+    color: var(--color-whatsapp-strong);
+  }
 }
 
 /* --- Animaciones ---------------------------------------------------------- */

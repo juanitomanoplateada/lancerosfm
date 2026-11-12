@@ -96,7 +96,7 @@ describe('PlayerBar', () => {
       render();
 
       expect(playButton().getAttribute('aria-label')).toBe('Sintonizar la emisora en vivo');
-      expect(title()).toBe('Presiona ▶ para sintonizar la 94.1 FM');
+      expect(title()).toBe('Escuchar en vivo');
       expect(announcement()).toBe('');
     });
 
