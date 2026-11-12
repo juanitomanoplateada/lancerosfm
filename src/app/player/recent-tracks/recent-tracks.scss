@@ -43,8 +43,14 @@
   white-space: nowrap;
 }
 
+/* En el celular el artista y la canción van en dos renglones, uno debajo del
+   otro: en una columna estrecha, el punto que los separa quedaba colgando al
+   final de la primera línea. Desde que cabe todo en una línea vuelven a ir
+   juntos. */
 .recent__track {
+  display: flex;
   flex: 1;
+  flex-direction: column;
   min-width: 0;
   max-width: none;
   margin: 0;
@@ -54,18 +60,6 @@
 
 .recent__artist {
   color: var(--color-primary);
-}
-
-/* En el celular el artista y la canción van en dos renglones, uno debajo del
-   otro: en una columna estrecha, el punto que los separa quedaba colgando al
-   final de la primera línea. Desde que cabe todo en una línea vuelven a ir
-   juntos. */
-.recent__track {
-  display: flex;
-  flex-direction: column;
-}
-
-.recent__artist {
   font-weight: 700;
 }
 

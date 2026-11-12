@@ -38,7 +38,18 @@ export function songRequestMessage(details: SongRequestDetails): string {
   return sentences.join(' ');
 }
 
+/** Lo que sobra al final de lo que escribe el oyente: un espacio o un punto. */
+const SPACE_OR_DOT = /[\s.]/;
+
 /** Sin espacios de sobra ni el punto final, que ya lo pone el mensaje. */
 function tidy(value = ''): string {
-  return value.trim().replace(/[\s.]+$/, '');
+  const text = value.trim();
+
+  // Se recorre desde el final en lugar de usar /[\s.]+$/: esa expresión prueba
+  // cada posición de una tira de espacios o puntos y, si detrás hay más texto,
+  // tarda un tiempo cuadrático.
+  let end = text.length;
+  while (end > 0 && SPACE_OR_DOT.test(text[end - 1])) end -= 1;
+
+  return text.slice(0, end);
 }

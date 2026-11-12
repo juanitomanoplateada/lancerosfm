@@ -20,7 +20,7 @@ interface AppleNavigator extends Navigator {
  * Cada navegador lo resuelve a su manera, y de aquí sale cuál de las tres le
  * toca al oyente: un botón que instala de un toque (Android y computador con
  * Chrome o Edge), los pasos a mano del iPhone, que no tiene tal botón, o las
- * indicaciones generales para todo lo demás.
+ * indicaciones generales para cualquier otro caso.
  *
  * El aviso del navegador llega una sola vez, poco después de cargar la página,
  * así que hay que estar escuchando desde el arranque y no desde que se abre la
@@ -52,10 +52,11 @@ export class AppInstall {
         globalThis.matchMedia?.('(display-mode: standalone)').matches === true,
     );
 
-    // El iPad se presenta como un Mac; lo delata la pantalla táctil.
+    // El iPad se presenta como un Mac en su agente de usuario; lo delata la
+    // pantalla táctil, que ningún Mac tiene.
+    const { userAgent, maxTouchPoints } = navigator;
     this.appleMobile.set(
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
+      /iPad|iPhone|iPod/.test(userAgent) || (userAgent.includes('Macintosh') && maxTouchPoints > 1),
     );
 
     // No se cancela el aviso: así el navegador sigue mostrando el suyo cuando

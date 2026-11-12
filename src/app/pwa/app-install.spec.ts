@@ -10,10 +10,8 @@ function installPrompt(prompt = vi.fn(() => Promise.resolve())): Event & { promp
 }
 
 /** Hace pasar a jsdom por otro dispositivo durante una prueba. */
-function pretendDevice(device: Partial<Record<'userAgent' | 'platform', string>>): void {
-  for (const [property, value] of Object.entries(device)) {
-    vi.spyOn(navigator, property as 'userAgent', 'get').mockReturnValue(value);
-  }
+function pretendDevice(userAgent: string): void {
+  vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(userAgent);
 }
 
 function start(platform = 'browser'): AppInstall {
@@ -112,27 +110,28 @@ describe('AppInstall', () => {
 
   describe('en iPhone y iPad, que no tienen botón de instalar', () => {
     it('reconoce el iPhone', () => {
-      pretendDevice({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)' });
+      pretendDevice('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)');
 
       expect(start().isAppleMobile()).toBe(true);
     });
 
     it('reconoce el iPad aunque se presente como un Mac, por la pantalla táctil', () => {
-      pretendDevice({
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-        platform: 'MacIntel',
-      });
+      pretendDevice('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)');
       Object.defineProperty(navigator, 'maxTouchPoints', { value: 5, configurable: true });
 
       expect(start().isAppleMobile()).toBe(true);
     });
 
     it('no confunde un Mac de verdad con un iPad', () => {
-      pretendDevice({
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-        platform: 'MacIntel',
-      });
+      pretendDevice('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)');
       Object.defineProperty(navigator, 'maxTouchPoints', { value: 0, configurable: true });
+
+      expect(start().isAppleMobile()).toBe(false);
+    });
+
+    it('tampoco confunde con un iPad a otro aparato con pantalla táctil', () => {
+      pretendDevice('Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+      Object.defineProperty(navigator, 'maxTouchPoints', { value: 10, configurable: true });
 
       expect(start().isAppleMobile()).toBe(false);
     });

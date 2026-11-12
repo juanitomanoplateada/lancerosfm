@@ -54,4 +54,26 @@ describe('songRequestMessage', () => {
       'Hola, quiero solicitar la canción: Ay hombe. Con un saludo para mi mamá.',
     );
   });
+
+  it('solo quita lo que sobra al final: los espacios y puntos de en medio se quedan', () => {
+    expect(songRequestMessage({ song: ' Vol. 2 ... en vivo . ' })).toBe(
+      'Hola, quiero solicitar la canción: Vol. 2 ... en vivo.',
+    );
+  });
+
+  it('quita también los saltos de línea y los espacios raros que deja pegar un texto', () => {
+    expect(songRequestMessage({ song: 'Ay hombe .\n\t' })).toBe(
+      'Hola, quiero solicitar la canción: Ay hombe.',
+    );
+  });
+
+  it('no se atasca con una tira larguísima de espacios y puntos en medio del texto', () => {
+    const song = `Ay${' .'.repeat(50_000)}hombe`;
+
+    const started = performance.now();
+    const message = songRequestMessage({ song });
+
+    expect(performance.now() - started).toBeLessThan(500);
+    expect(message).toBe(`Hola, quiero solicitar la canción: ${song}.`);
+  });
 });

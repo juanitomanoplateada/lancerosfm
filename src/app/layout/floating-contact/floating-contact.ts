@@ -38,7 +38,7 @@ export class FloatingContact {
    * Hay dos páginas donde sobra. En la portada, el botón grande de reproducir
    * ocupa el centro de la pantalla y la burbuja se le montaba encima; allí ya
    * hay una tarjeta de «Pedir por WhatsApp», así que no se pierde el acceso. Y
-   * en la de contacto, todo lo que ofrece el menú está escrito en la página.
+   * en la de contacto, cada cosa que ofrece el menú ya está escrita en la página.
    */
   protected readonly visible = computed(() => !PAGES_WITHOUT_BUBBLE.has(this.currentPath()));
 
