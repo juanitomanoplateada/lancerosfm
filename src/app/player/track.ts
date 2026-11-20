@@ -21,9 +21,11 @@ export interface StreamMetadata {
 
 /**
  * La automatización rellena el campo de artista con estos valores cuando no hay
- * uno de verdad — pasa con las cuñas y los avisos de la comunidad.
+ * uno de verdad — pasa con las cuñas, los avisos de la comunidad y los bloques
+ * de programa. Las promociones llegan marcadas con «PROMOCION» en ese campo: no
+ * son canciones y no se pueden pedir.
  */
-const PLACEHOLDER_ARTIST = /^(\[?unknown\]?|desconocido|n\/?a|-{1,2})$/i;
+const PLACEHOLDER_ARTIST = /^(\[?unknown\]?|artist|desconocido|n\/?a|-{1,2}|promoci[oó]n)$/i;
 
 /**
  * Parte «Artista - Canción» en dos campos.

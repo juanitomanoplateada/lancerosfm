@@ -35,6 +35,16 @@ describe('parseTrack', () => {
     expect(parseTrack('[Unknown] - 15.00 AM').artist).toBe('');
     expect(parseTrack('Unknown - Cuña institucional').artist).toBe('');
     expect(parseTrack('- - Aviso de la comunidad').artist).toBe('');
+    expect(parseTrack('artist - FESTIVAL VALLENATO').artist).toBe('');
+  });
+
+  it('no presenta una promoción como si fuera una canción', () => {
+    expect(parseTrack('PROMOCION - EXITO')).toEqual({ artist: '', title: 'EXITO' });
+    expect(parseTrack('Promoción - Feria de Tuta').artist).toBe('');
+  });
+
+  it('conserva un artista que solo contiene una palabra de relleno', () => {
+    expect(parseTrack('Artistas Unidos - Himno').artist).toBe('Artistas Unidos');
   });
 
   it('conserva los avisos con emisor real', () => {
